@@ -4,11 +4,12 @@
   :min-lein-version "2.0.0"
 
   :dependencies [[org.clojure/clojure "1.7.0"]
-                 [compojure "1.3.1"]
+                 [compojure "1.4.0"]
                  [org.clojure/clojurescript "0.0-3308"]
                  [hiccup "1.0.5"]
                  [ring "1.4.0"]
                  [com.taoensso/sente "1.5.0"]
+                 [org.clojure/tools.logging "0.3.1"]
                  [ring/ring-defaults "0.1.5"]
                  [http-kit "2.0.0"]]
 
