@@ -3,8 +3,9 @@
   :url "http://example.com/FIXME"
   :min-lein-version "2.0.0"
 
-  :dependencies [[org.clojure/clojure "1.6.0"]
+  :dependencies [[org.clojure/clojure "1.7.0"]
                  [compojure "1.3.1"]
+                 [org.clojure/clojurescript "0.0-3308"]
                  [hiccup "1.0.5"]
                  [ring "1.4.0"]
                  [com.taoensso/sente "1.5.0"]
@@ -15,5 +16,21 @@
 
   {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
                         [ring-mock "0.1.5"]]}}
+
+  :plugins [[lein-cljsbuild "1.0.6"]]
+
+  :source-paths ["src"]
+
+  :clean-targets ^{:protect false} ["resources/public/javascript"]
+
+  :cljsbuild {
+    :builds [{:id "planning-poker"
+              :source-paths ["src"]
+              :compiler {:main planning-poker.core
+                         :asset-path "javascript"
+                         :output-to "resources/public/javascript/main.js"
+                         :output-dir "resources/public/javascript"
+                         :optimizations :none
+                         :verbose true}}]}
 
   :main planning-poker.routes)

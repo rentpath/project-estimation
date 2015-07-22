@@ -12,7 +12,8 @@
 (defn voting-page []
   (html5
     [:head
-      [:title "Estimation"]]
+      [:title "Estimation"]
+      [:script {:src "javascript/main.js"}]]
     [:body
       [:h1 "Estimate"]
       [:ol
