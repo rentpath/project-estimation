@@ -36,7 +36,6 @@
 
 (defonce server (atom nil))
 
-;; Entry point. `lein run` will pick up and start from here
 (defn -main [& args]
   (reset! server (run-server #'app {:port 8080})))
 
@@ -54,7 +53,7 @@
 
 ;; Wrap for logging, catching, etc.:
 (defn msg-handler* [{:as ev-msg :keys [id ?data event]}]
-  (println "Event: %s" event)
+  ; (println "Event: %s" event)
   (msg-handler ev-msg))
 
 ; Server-side methods
@@ -72,14 +71,21 @@
 
 (defmethod msg-handler :planning-poker.core/user-joined-session
   [evt]
-  (println "User joined: %s" evt))
+  (println "User joined: " evt)
+  (println (str @connected-uids))
+  (notify-all @connected-uids))
 ;;(defmethod msg-handler :chsk/)
 ;; Add your (defmethod msg-handler <id> [ev-msg] <body>)s here...
 
+(defn notify-all
+  [{uids :any}]
+  (doseq [uid uids]
+    (chsk-send! uid [::user-joined-session {:names uids}])))
+; (notify-all @connected-uids)
 (sente/start-chsk-router! ch-chsk msg-handler*)
 
 (comment
-
+  (chsk-send! "35b37a13-4318-4434-a762-2f79b37ef5df" [::user-joined-session {:name "Michael"}])
   (chsk-send! :sente/all-users-without-uid [::user-joined-session {:name "Michael"}])
   (chsk-send! :sente/all-users-without-uid [::user-estimated {:a :data}])
 

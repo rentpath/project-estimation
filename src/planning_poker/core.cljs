@@ -3,7 +3,9 @@
     [cljs.core.async.macros :as a :refer (go go-loop)])
   (:require
     [cljs.core.async :as a :refer (<! >! put! chan)]
-    [taoensso.sente  :as sente :refer (cb-success?)]))
+    [taoensso.sente :as sente :refer (cb-success?)])
+  (:import
+   [goog dom]))
 
 (def events-to-send (chan))
 
@@ -21,8 +23,12 @@
 
 (defmulti payload-handler (comp first second))
 
+;; FIXME
+;; Data is in this format:
+;; [:chsk/recv [:planning-poker.routes/user-joined-session {:names #{35b37a13-4318-4434-a762-2f79b37ef5df}}]]
 (defmethod payload-handler :planning-poker.routes/user-joined-session
   [data]
+  (dom/setTextContent (dom/getElementByClass "players") (:names (second (second data))))
   (println "Custom event from server:" data))
 
 (defmethod payload-handler :planning-poker.routes/user-estimated
