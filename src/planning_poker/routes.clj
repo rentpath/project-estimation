@@ -5,7 +5,6 @@
 
   (:require [compojure.core :refer :all]
             [compojure.route :as route]
-            [compojure.handler :refer [site]]
             [ring.middleware.reload :as reload]
             [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
             [clojure.tools.logging :refer :all]
@@ -29,19 +28,24 @@
 
 (def app
   (-> app-routes
-      (wrap-defaults site-defaults)
-      ring.middleware.keyword-params/wrap-keyword-params
-      ring.middleware.params/wrap-params))
+      (wrap-defaults site-defaults)))
 
 ;; TODO read a config variable from command line, env, or file?
 (defn in-dev? [args] true)
 
+(defonce server (atom nil))
+
 ;; Entry point. `lein run` will pick up and start from here
 (defn -main [& args]
   (let [handler (if (in-dev? args)
-                  (reload/wrap-reload (site #'app))
-                  (site app))]
-    (run-server handler {:port 8080})))
+                  (reload/wrap-reload #'app))]
+    (reset! server (run-server handler {:port 8080}))))
+
+(defn reset
+  []
+  (when @server
+    (@server)
+    (-main)))
 
 ;; run-server returns a function that stops the server
 ; (let [server (run-server app options)]
@@ -55,14 +59,22 @@
   (debugf "Event: %s" event)
   (event-msg-handler ev-msg))
 
-(do ; Server-side methods
-  (defmethod event-msg-handler :default ; Fallback
-    [{:as ev-msg :keys [event id ?data ring-req ?reply-fn send-fn]}]
-    (let [session (:session ring-req)
-          uid     (:uid     session)]
-      (debugf "Unhandled event: %s" event)
-      (when ?reply-fn
-        (?reply-fn {:umatched-event-as-echoed-from-from-server event}))))
+; Server-side methods
+(defmethod event-msg-handler :default ; Fallback
+  [{:as ev-msg :keys [event id ?data ring-req ?reply-fn send-fn]}]
+  (let [session (:session ring-req)
+        uid     (:uid     session)]
+    (debugf "Unhandled event: %s" event)
+    (when ?reply-fn
+      (?reply-fn {:umatched-event-as-echoed-from-from-server event}))))
 
-  ;; Add your (defmethod event-msg-handler <event-id> [ev-msg] <body>)s here...
+;; Add your (defmethod event-msg-handler <event-id> [ev-msg] <body>)s here...
+
+(sente/start-chsk-router! ch-chsk event-msg-handler)
+
+
+(comment
+
+  (chsk-send! :sente/all-users-without-uid [::something {:a :data}])
+
   )

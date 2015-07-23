@@ -16,44 +16,37 @@
 (enable-console-print!)
 (println "Hello world!")
 
+;; Payload handler is for our custom event ids
 
-(defmulti event-msg-handler :id) ; Dispatch on event-id
+(defmulti payload-handler (comp first second))
+
+(defmethod payload-handler :planning-poker.routes/something
+  [data]
+  (println "Custom event from server:" data))
+
+;; Handler for events
 
 ;; Wrap for logging, catching, etc.:
-(defn event-msg-handler* [{:as ev-msg :keys [id ?data event]}]
-  (debugf "Event: %s" event)
-  (event-msg-handler ev-msg))
-(do
-  (defmethod event-msg-handler :default ; Fallback
-    [{:as ev-msg :keys [event]}]
-    (debugf "Unhandled event: %s" event))
+(defn msg-handler* [{:as ev-msg :keys [event]}]
+  (msg-handler event))
 
-  (defmethod event-msg-handler :chsk/state
-    [{:as ev-msg :keys [?data]}]
-    (if (= ?data {:first-open? true})
-      (debugf "Channel socket successfully established!")
-      (debugf "Channel socket state change: %s" ?data)))
+(defmulti msg-handler first)
 
-  (defmethod event-msg-handler :chsk/recv
-    [{:as ev-msg :keys [?data]}]
-    (debugf "Push event from server: %s" ?data))
+(defmethod msg-handler :default ; Fallback
+  [msg]
+  (println "Unhandled event:" (first msg)))
 
-  (defmethod event-msg-handler :chsk/handshake
-    [{:as ev-msg :keys [?data]}]
-    (let [[?uid ?csrf-token ?handshake-data] ?data]
-      (debugf "Handshake: %s" ?data)))
+(defmethod msg-handler :chsk/handshake
+  [msg]
+  (println "Handshake" msg))
 
-  (defmethod event-msg-handler :chsk/closed
-    [{:as ev-msg :keys [?data]}]
-    (println "test")
-    (debugf "Channel socket not open: %s" ?data))
+(defmethod msg-handler :chsk/state
+  [msg]
+  (println "State" msg))
 
-  )
-(chsk-send!
-  [:some/request-id {:name "Rich Hickey" :type "Awesome"}] ; Event
-  8000 ; Timeout
-  ;; Optional callback:
-  (fn [edn-reply]
-    (if (sente/cb-success? edn-reply) ; Checks for :chsk/closed, :chsk/timeout, :chsk/error
-      (println "yes!")
-      (println (str edn-reply)))))
+(defmethod msg-handler :chsk/recv
+  [msg]
+  (println "Push event from server:" msg)
+  (payload-handler msg))
+
+(sente/start-chsk-router! ch-chsk msg-handler*)
