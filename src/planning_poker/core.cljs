@@ -5,7 +5,9 @@
     [cljs.core.async :as a :refer (<! >! put! chan)]
     [taoensso.sente :as sente :refer (cb-success?)])
   (:import
-   [goog dom]))
+    [goog dom]
+    [goog window]
+    [goog.dom forms]))
 
 (def events-to-send (chan))
 
@@ -19,52 +21,58 @@
 
 (enable-console-print!)
 
-;; Payload handler is for our custom event ids
-
 (defmulti payload-handler (comp first second))
 
 ;; FIXME
 ;; Data is in this format:
 ;; [:chsk/recv [:planning-poker.routes/user-joined-session {:names #{35b37a13-4318-4434-a762-2f79b37ef5df}}]]
-(defmethod payload-handler :planning-poker.routes/user-joined-session
+(defmethod payload-handler :planning-poker.message-handler/user-joined-session
   [data]
   (dom/setTextContent (dom/getElementByClass "players") (:names (second (second data))))
   (println "Custom event from server:" data))
 
-(defmethod payload-handler :planning-poker.routes/user-estimated
+(defmethod payload-handler :planning-poker.message-handler/user-estimated
   [data]
   (println "Custom event from server:" data))
 
 ;; Handler for events
 
 ;; Wrap for logging, catching, etc.:
-(defn msg-handler* [{:as ev-msg :keys [event]}]
-  (msg-handler event))
+(defn message-handler* [{:as ev-message :keys [event]}]
+  (message-handler event))
 
-(defmulti msg-handler first)
+(defmulti message-handler first)
 
-(defmethod msg-handler :default ; Fallback
-  [msg]
-  (println "Unhandled event:" (first msg)))
+(defmethod message-handler :default
+  [message]
+  (println "Unhandled event:" (first message)))
 
-(defmethod msg-handler :chsk/handshake
-  [msg]
-  (println "Handshake" msg)
+(defmethod message-handler :chsk/handshake
+  [message]
+  (println "Handshake" message)
   (go
     (loop []
-      (let [evt (<! events-to-send)]
-        (chsk-send! evt))
+      (let [event (<! events-to-send)]
+        (chsk-send! event))
       (recur))))
 
-(defmethod msg-handler :chsk/state
-  [msg]
-  (println "State" msg))
+(defmethod message-handler :chsk/state
+  [message]
+  (println "State" message))
 
-(defmethod msg-handler :chsk/recv
-  [msg]
-  (println "Push event from server:" msg)
-  (payload-handler msg))
+(defmethod message-handler :chsk/recv
+  [message]
+  (println "Push event from server:" message)
+  (payload-handler message))
 
-(sente/start-chsk-router! ch-chsk msg-handler*)
+(sente/start-chsk-router! ch-chsk message-handler*)
 
-(go (>! events-to-send [::user-joined-session {:name "Michael"}]))
+(defn name
+  []
+  (forms/getValue (dom/getElementByClass "name")))
+
+(defn pathname
+  []
+  (subs (str (.-pathname (.-location js/window))) 1))
+
+(go (>! events-to-send [::user-joined-session {:name (name) :pathname (pathname)}]))

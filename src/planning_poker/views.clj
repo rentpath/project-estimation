@@ -16,6 +16,8 @@
     [:script {:src "javascript/main.js"}]]
    [:body
     [:h1 "Estimates"]
+    [:form
+     [:input.name {:value "Roy"}]]
     [:h2 "Cards"]
     [:ol.cards
      (for [x [0 1 2 3 5 8 13 20]]
