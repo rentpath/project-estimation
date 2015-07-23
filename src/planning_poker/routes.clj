@@ -5,14 +5,16 @@
 
   (:require [compojure.core :refer :all]
             [compojure.route :as route]
-            [ring.middleware.reload :as reload]
             [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
-            [clojure.tools.logging :refer :all]
             [taoensso.sente :as sente]
             [taoensso.sente.server-adapters.http-kit :refer (sente-web-server-adapter)]))
 
 (let [{:keys [ch-recv send-fn ajax-post-fn ajax-get-or-ws-handshake-fn connected-uids]}
-      (sente/make-channel-socket! sente-web-server-adapter {})]
+      (sente/make-channel-socket! sente-web-server-adapter {:user-id-fn (fn [ring-req]
+                                                                          (-> ring-req
+                                                                              :cookies
+                                                                              (get "ring-session")
+                                                                              :value))})]
   (def ring-ajax-post ajax-post-fn)
   (def ring-ajax-get-or-ws-handshake ajax-get-or-ws-handshake-fn)
   (def ch-chsk ch-recv) ; ChannelSocket's receive channel
@@ -27,8 +29,7 @@
   (route/not-found "Not Found"))
 
 (def app
-  (-> app-routes
-      (wrap-defaults site-defaults)))
+  (wrap-defaults app-routes site-defaults))
 
 ;; TODO read a config variable from command line, env, or file?
 (defn in-dev? [args] true)
@@ -37,9 +38,7 @@
 
 ;; Entry point. `lein run` will pick up and start from here
 (defn -main [& args]
-  (let [handler (if (in-dev? args)
-                  (reload/wrap-reload #'app))]
-    (reset! server (run-server handler {:port 8080}))))
+  (reset! server (run-server #'app {:port 8080})))
 
 (defn reset
   []
@@ -51,30 +50,37 @@
 ; (let [server (run-server app options)]
 ;   (server))
 
+(defmulti msg-handler :id) ; Dispatch on id
 
-
-(defmulti event-msg-handler :id) ; Dispatch on event-id
 ;; Wrap for logging, catching, etc.:
-(defn     event-msg-handler* [{:as ev-msg :keys [id ?data event]}]
-  (debugf "Event: %s" event)
-  (event-msg-handler ev-msg))
+(defn msg-handler* [{:as ev-msg :keys [id ?data event]}]
+  (println "Event: %s" event)
+  (msg-handler ev-msg))
 
 ; Server-side methods
-(defmethod event-msg-handler :default ; Fallback
+(defmethod msg-handler :default ; Fallback
   [{:as ev-msg :keys [event id ?data ring-req ?reply-fn send-fn]}]
   (let [session (:session ring-req)
         uid     (:uid     session)]
-    (debugf "Unhandled event: %s" event)
+    (println "Unhandled event: %s" event)
     (when ?reply-fn
-      (?reply-fn {:umatched-event-as-echoed-from-from-server event}))))
+      (?reply-fn {:umatched-as-echoed-from-from-server event}))))
 
-;; Add your (defmethod event-msg-handler <event-id> [ev-msg] <body>)s here...
+(defmethod msg-handler :chsk/ws-ping
+  [evt]
+  :no-op)
 
-(sente/start-chsk-router! ch-chsk event-msg-handler)
+(defmethod msg-handler :planning-poker.core/user-joined-session
+  [evt]
+  (println "User joined: %s" evt))
+;;(defmethod msg-handler :chsk/)
+;; Add your (defmethod msg-handler <id> [ev-msg] <body>)s here...
 
+(sente/start-chsk-router! ch-chsk msg-handler*)
 
 (comment
 
-  (chsk-send! :sente/all-users-without-uid [::something {:a :data}])
+  (chsk-send! :sente/all-users-without-uid [::user-joined-session {:name "Michael"}])
+  (chsk-send! :sente/all-users-without-uid [::user-estimated {:a :data}])
 
   )

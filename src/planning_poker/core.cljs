@@ -1,9 +1,11 @@
 (ns planning-poker.core
   (:require-macros
-    [cljs.core.async.macros :as asyncm :refer (go go-loop)])
+    [cljs.core.async.macros :as a :refer (go go-loop)])
   (:require
-    [cljs.core.async :as async :refer (<! >! put! chan)]
+    [cljs.core.async :as a :refer (<! >! put! chan)]
     [taoensso.sente  :as sente :refer (cb-success?)]))
+
+(def events-to-send (chan))
 
 (let [{:keys [chsk ch-recv send-fn state]}
       (sente/make-channel-socket! "/chsk"
@@ -14,13 +16,16 @@
   (def chsk-state state)) ; Watchable, read-only atom
 
 (enable-console-print!)
-(println "Hello world!")
 
 ;; Payload handler is for our custom event ids
 
 (defmulti payload-handler (comp first second))
 
-(defmethod payload-handler :planning-poker.routes/something
+(defmethod payload-handler :planning-poker.routes/user-joined-session
+  [data]
+  (println "Custom event from server:" data))
+
+(defmethod payload-handler :planning-poker.routes/user-estimated
   [data]
   (println "Custom event from server:" data))
 
@@ -38,7 +43,12 @@
 
 (defmethod msg-handler :chsk/handshake
   [msg]
-  (println "Handshake" msg))
+  (println "Handshake" msg)
+  (go
+    (loop []
+      (let [evt (<! events-to-send)]
+        (chsk-send! evt))
+      (recur))))
 
 (defmethod msg-handler :chsk/state
   [msg]
@@ -50,3 +60,5 @@
   (payload-handler msg))
 
 (sente/start-chsk-router! ch-chsk msg-handler*)
+
+(go (>! events-to-send [::user-joined-session {:name "Michael"}]))

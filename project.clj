@@ -14,10 +14,8 @@
                  [ring/ring-defaults "0.1.5"]
                  [http-kit "2.0.0"]]
 
-  :profiles
-
-  {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
-                        [ring-mock "0.1.5"]]}}
+  :profiles {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
+                                  [ring-mock "0.1.5"]]}}
 
   :plugins [[lein-cljsbuild "1.0.6"]]
 
