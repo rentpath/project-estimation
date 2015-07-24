@@ -65,7 +65,8 @@
 (defmethod message-handler :planning-poker.core/player-estimated
   [{:as event-message :keys [?data]}]
   (let [ring-request (:ring-req event-message)]
-    (notify-player-estimated @connected-uids {(player-id ring-request) ?data})
+    (notify-player-estimated @connected-uids {:player-id (player-id ring-request)
+                                              :estimate ?data})
     (clojure.pprint/pprint {(player-id ring-request) ?data})))
 
 ;; Add your (defmethod message-handler <id> [event-message] <body>)s here...

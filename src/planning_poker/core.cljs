@@ -35,12 +35,21 @@
       (let [list-element (dom/createElement "li")]
         (dom/setProperties list-element (js-obj "data-player-id" (first player)))
         (dom/appendChild list-element (dom/createTextNode (second player)))
-        (dom/appendChild html-list list-element))))
+        (let [span-element (dom/createElement "span")]
+          (dom/setProperties span-element (js-obj "data-estimate" ""))
+          (dom/appendChild list-element span-element)
+          (dom/appendChild html-list list-element)))))
   (println "Custom event from server:" data))
 
 (defmethod payload-handler :planning-poker.message-handler/player-estimated
-  [data]
-  (println "Custom event from server:" data))
+  [[_ [_ data]]]
+  (dom/setTextContent
+    (.querySelector
+      (.querySelector
+        (.querySelector js/document ".players")
+        (str "[data-player-id='" (:player-id data) "']"))
+      "[data-estimate]")
+    (:estimate data)))
 
 ;; Handler for events
 
