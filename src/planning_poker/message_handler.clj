@@ -20,10 +20,20 @@
   (def chsk-send! send-fn) ; ChannelSocket's send API fn
   (def connected-uids connected-uids)) ; Watchable, read-only atom
 
+(defn uids
+  [connected-uids]
+  (:any connected-uids))
+
 (defn notify-all
   [{uids :any}]
   (doseq [uid uids]
-    (chsk-send! uid [::user-joined-session {:names uids}])))
+    (chsk-send! uid [::user-joined-session @players])))
+
+(defn notify-player-quit
+  [players]
+  (let [uids (keys players)]
+    (doseq [uid uids]
+      (chsk-send! uid [::player-quit players]))))
 
 (defmulti message-handler :id)
 
@@ -46,7 +56,6 @@
 (defmethod message-handler :planning-poker.core/user-joined-session
   [{:as event-message :keys [?data]}]
   (let [ring-request (:ring-req event-message)]
-    (clojure.pprint/pprint event-message)
     (swap! players assoc (player-id ring-request) ?data)
     (notify-all @connected-uids)))
 
@@ -54,16 +63,27 @@
 
 (sente/start-chsk-router! ch-chsk message-handler*)
 
-; (notify-all @connected-uids)
-;; run-server returns a function that stops the server
-; (let [server (run-server app options)]
-;   (server))
+(defn uids-to-remove
+  [old-connected-uids current-connected-uids]
+  (clojure.set/difference (uids old-connected-uids) (uids current-connected-uids)))
 
-; (add-watch connected-uids :update-players (fn [key ref old new] (notify-all new)))
+(defn remove-players
+  [players-to-remove]
+  (swap! players (fn [collection] (apply dissoc collection players-to-remove))))
+
+(add-watch connected-uids
+           :remove-players
+           (fn [key ref old-state new-state]
+             (let [invalid-uids (uids-to-remove old-state new-state)]
+               (when (seq invalid-uids)
+                 (remove-players invalid-uids)
+                 (notify-player-quit @players)))))
 
 (comment
   (chsk-send! "ebf214e7-d41a-4990-acad-c60675d30a30" [::user-joined-session {:name "Michael"}])
   (chsk-send! :sente/all-users-without-uid [::user-estimated {:a :data}])
   (player-id {:cookies {"ring-session" {:value "abcd"}}})
   (clojure.pprint/pprint @players)
+  (notify-player-quit @players)
+  (remove-players #{"7aa0b59a-7407-4426-8deb-60501425a1cc"})
   )
