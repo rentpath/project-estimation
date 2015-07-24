@@ -23,13 +23,17 @@
 
 (defmulti payload-handler (comp first second))
 
-;; FIXME
 ;; Data is in this format:
-;; [:chsk/recv [:planning-poker.routes/players-updated {"35b37a13-4318-4434-a762-2f79b37ef5df" "Michael"}}]]
+;; [:chsk/recv [:planning-poker.routes/players-updated {"a13-18-434-a62-2f5df" "Michael"}}]]
 (defmethod payload-handler :planning-poker.message-handler/players-updated
   [data]
-  (println (vals (second (second data))))
-  (dom/setTextContent (dom/getElementByClass "players") (str (vals (second (second data)))))
+  (let [html-list (dom/getElementByClass "players")
+        players (second (second data))]
+    (doseq [player players]
+      (let [list-element (dom/createElement "li")]
+        (dom/setProperties list-element (js-obj "data-player-id" (first player)))
+        (dom/appendChild list-element (dom/createTextNode (second player)))
+        (dom/appendChild html-list list-element))))
   (println "Custom event from server:" data))
 
 (defmethod payload-handler :planning-poker.message-handler/user-estimated
