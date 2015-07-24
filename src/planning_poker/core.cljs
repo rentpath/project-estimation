@@ -3,7 +3,8 @@
     [cljs.core.async.macros :as a :refer (go go-loop)])
   (:require
     [cljs.core.async :as a :refer (<! >! put! chan)]
-    [taoensso.sente :as sente :refer (cb-success?)])
+    [taoensso.sente :as sente :refer (cb-success?)]
+    [goog.events :as gevents])
   (:import
     [goog dom]
     [goog window]
@@ -37,7 +38,7 @@
         (dom/appendChild html-list list-element))))
   (println "Custom event from server:" data))
 
-(defmethod payload-handler :planning-poker.message-handler/user-estimated
+(defmethod payload-handler :planning-poker.message-handler/player-estimated
   [data]
   (println "Custom event from server:" data))
 
@@ -68,13 +69,25 @@
 
 (defmethod message-handler :chsk/recv
   [message]
-  (println "Push event from server:" message)
   (payload-handler message))
 
 (sente/start-chsk-router! ch-chsk message-handler*)
 
-(defn name
+(defn player-name
   []
   (forms/getValue (dom/getElementByClass "name")))
 
-(go (>! events-to-send [::user-joined-session (name)]))
+(defn estimate
+  [event]
+  (-> event .-target dom/getTextContent))
+
+(gevents/listen (dom/getElementByClass "cards")
+                goog.events.EventType.CLICK
+                (fn [event]
+                  (go (>! events-to-send [::player-estimated (estimate event)]))))
+
+(go (>! events-to-send [::player-joined (player-name)]))
+
+(comment
+  (println (dom/getChildren (dom/getElementByClass "players")))
+  )

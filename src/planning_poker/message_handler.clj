@@ -24,10 +24,19 @@
   [connected-uids]
   (:any connected-uids))
 
-(defn notify-update-players
+(defn notify
+  [player-ids]
+  (fn [event data]
+    (doseq [id player-ids]
+      (chsk-send! id [event data]))))
+
+(defn notify-players-updated
   [{uids :any}]
-  (doseq [uid uids]
-    (chsk-send! uid [::players-updated @players])))
+  ((notify uids) ::players-updated @players))
+
+(defn notify-player-estimated
+  [{uids :any} estimate]
+  ((notify uids) ::player-estimated estimate))
 
 (defmulti message-handler :id)
 
@@ -47,11 +56,17 @@
   [event]
   :no-op)
 
-(defmethod message-handler :planning-poker.core/user-joined-session
+(defmethod message-handler :planning-poker.core/player-joined
   [{:as event-message :keys [?data]}]
   (let [ring-request (:ring-req event-message)]
     (swap! players assoc (player-id ring-request) ?data)
-    (notify-update-players @connected-uids)))
+    (notify-players-updated @connected-uids)))
+
+(defmethod message-handler :planning-poker.core/player-estimated
+  [{:as event-message :keys [?data]}]
+  (let [ring-request (:ring-req event-message)]
+    (notify-player-estimated @connected-uids {(player-id ring-request) ?data})
+    (clojure.pprint/pprint {(player-id ring-request) ?data})))
 
 ;; Add your (defmethod message-handler <id> [event-message] <body>)s here...
 
@@ -71,13 +86,13 @@
              (let [invalid-uids (uids-to-remove old-state new-state)]
                (when (seq invalid-uids)
                  (remove-players invalid-uids)
-                 (notify-update-players @connected-uids)))))
+                 (notify-players-updated @connected-uids)))))
 
 (comment
   (chsk-send! "a2-b2-c3-d4-e5" [::players-updated {"a1-b2-c3-d4-e5" "Michael"}])
-  (chsk-send! :sente/all-users-without-uid [::user-estimated {:a :data}])
+  (chsk-send! :sente/all-users-without-uid [::player-estimated {:a :data}])
   (player-id {:cookies {"ring-session" {:value "abcd"}}})
   (clojure.pprint/pprint @players)
-  (notify-update-players @connected-uids)
+  (notify-players-updated @connected-uids)
   (remove-players #{"7aa0b59a-7407-4426-8deb-60501425a1cc"})
   )

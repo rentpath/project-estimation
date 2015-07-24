@@ -3,16 +3,16 @@
   :url "http://example.com/FIXME"
   :min-lein-version "2.0.0"
 
-  :dependencies [[org.clojure/clojure "1.7.0"]
+  :dependencies [[com.taoensso/sente "1.5.0"]
                  [compojure "1.4.0"]
+                 [hiccup "1.0.5"]
+                 [http-kit "2.0.0"]
+                 [org.clojure/clojure "1.7.0"]
                  [org.clojure/clojurescript "0.0-3308"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
-                 [hiccup "1.0.5"]
-                 [ring "1.4.0"]
-                 [com.taoensso/sente "1.5.0"]
                  [org.clojure/tools.logging "0.3.1"]
-                 [ring/ring-defaults "0.1.5"]
-                 [http-kit "2.0.0"]]
+                 [ring "1.4.0"]
+                 [ring/ring-defaults "0.1.5"]]
 
   :profiles {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
                                   [ring-mock "0.1.5"]]}}
