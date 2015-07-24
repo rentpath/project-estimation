@@ -29,6 +29,7 @@
   [data]
   (let [html-list (dom/getElementByClass "players")
         players (second (second data))]
+    (dom/removeChildren html-list)
     (doseq [player players]
       (let [list-element (dom/createElement "li")]
         (dom/setProperties list-element (js-obj "data-player-id" (first player)))
