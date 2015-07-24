@@ -25,14 +25,8 @@
 
 ;; FIXME
 ;; Data is in this format:
-;; [:chsk/recv [:planning-poker.routes/user-joined-session {"35b37a13-4318-4434-a762-2f79b37ef5df" "Michael"}}]]
-(defmethod payload-handler :planning-poker.message-handler/user-joined-session
-  [data]
-  (println (vals (second (second data))))
-  (dom/setTextContent (dom/getElementByClass "players") (str (vals (second (second data)))))
-  (println "Custom event from server:" data))
-
-(defmethod payload-handler :planning-poker.message-handler/player-quit
+;; [:chsk/recv [:planning-poker.routes/players-updated {"35b37a13-4318-4434-a762-2f79b37ef5df" "Michael"}}]]
+(defmethod payload-handler :planning-poker.message-handler/players-updated
   [data]
   (println (vals (second (second data))))
   (dom/setTextContent (dom/getElementByClass "players") (str (vals (second (second data)))))

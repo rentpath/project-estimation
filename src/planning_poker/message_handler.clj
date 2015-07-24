@@ -24,16 +24,10 @@
   [connected-uids]
   (:any connected-uids))
 
-(defn notify-all
+(defn notify-update-players
   [{uids :any}]
   (doseq [uid uids]
-    (chsk-send! uid [::user-joined-session @players])))
-
-(defn notify-player-quit
-  [players]
-  (let [uids (keys players)]
-    (doseq [uid uids]
-      (chsk-send! uid [::player-quit players]))))
+    (chsk-send! uid [::players-updated @players])))
 
 (defmulti message-handler :id)
 
@@ -57,7 +51,7 @@
   [{:as event-message :keys [?data]}]
   (let [ring-request (:ring-req event-message)]
     (swap! players assoc (player-id ring-request) ?data)
-    (notify-all @connected-uids)))
+    (notify-update-players @connected-uids)))
 
 ;; Add your (defmethod message-handler <id> [event-message] <body>)s here...
 
@@ -77,13 +71,13 @@
              (let [invalid-uids (uids-to-remove old-state new-state)]
                (when (seq invalid-uids)
                  (remove-players invalid-uids)
-                 (notify-player-quit @players)))))
+                 (notify-update-players @connected-uids)))))
 
 (comment
-  (chsk-send! "ebf214e7-d41a-4990-acad-c60675d30a30" [::user-joined-session {:name "Michael"}])
+  (chsk-send! "a2-b2-c3-d4-e5" [::players-updated {"a1-b2-c3-d4-e5" "Michael"}])
   (chsk-send! :sente/all-users-without-uid [::user-estimated {:a :data}])
   (player-id {:cookies {"ring-session" {:value "abcd"}}})
   (clojure.pprint/pprint @players)
-  (notify-player-quit @players)
+  (notify-update-players @connected-uids)
   (remove-players #{"7aa0b59a-7407-4426-8deb-60501425a1cc"})
   )
