@@ -71,8 +71,4 @@
   []
   (forms/getValue (dom/getElementByClass "name")))
 
-(defn pathname
-  []
-  (subs (str (.-pathname (.-location js/window))) 1))
-
-(go (>! events-to-send [::user-joined-session {:name (name) :pathname (pathname)}]))
+(go (>! events-to-send [::user-joined-session (name)]))
