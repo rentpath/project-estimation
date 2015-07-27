@@ -11,6 +11,7 @@
                  [org.clojure/clojurescript "0.0-3308"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
                  [org.clojure/tools.logging "0.3.1"]
+                 [reagent "0.5.0"]
                  [ring "1.4.0"]
                  [ring/ring-defaults "0.1.5"]]
 

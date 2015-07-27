@@ -23,6 +23,6 @@
        [:li
         [:button x]])]
     [:h2 "Players"]
-    [:ol.players]
+    [:div.players]
     [:script {:src "javascript/main.js"}]
     ]))

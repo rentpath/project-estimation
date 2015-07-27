@@ -4,7 +4,8 @@
   (:require
     [cljs.core.async :as a :refer (<! >! put! chan)]
     [taoensso.sente :as sente :refer (cb-success?)]
-    [goog.events :as gevents])
+    [goog.events :as gevents]
+    [reagent.core :as reagent :refer [atom]])
   (:import
     [goog dom]
     [goog window]
@@ -24,32 +25,12 @@
 
 (defmulti payload-handler (comp first second))
 
-;; Data is in this format:
-;; [:chsk/recv [:planning-poker.routes/players-updated {"a13-18-434-a62-2f5df" "Michael"}}]]
+;; Initial parameter is in this format:
+;; [:chsk/recv [:planning-poker.routes/players-updated {"a13-18-434-a62-2f5df" {:name "Michael"}}]]
 (defmethod payload-handler :planning-poker.message-handler/players-updated
-  [data]
-  (let [html-list (dom/getElementByClass "players")
-        players (second (second data))]
-    (dom/removeChildren html-list)
-    (doseq [player players]
-      (let [list-element (dom/createElement "li")]
-        (dom/setProperties list-element (js-obj "data-player-id" (first player)))
-        (dom/appendChild list-element (dom/createTextNode (second player)))
-        (let [span-element (dom/createElement "span")]
-          (dom/setProperties span-element (js-obj "data-estimate" ""))
-          (dom/appendChild list-element span-element)
-          (dom/appendChild html-list list-element)))))
-  (println "Custom event from server:" data))
-
-(defmethod payload-handler :planning-poker.message-handler/player-estimated
   [[_ [_ data]]]
-  (dom/setTextContent
-    (.querySelector
-      (.querySelector
-        (.querySelector js/document ".players")
-        (str "[data-player-id='" (:player-id data) "']"))
-      "[data-estimate]")
-    (:estimate data)))
+  (reset! players data)
+  (println "Custom event from server:" data))
 
 ;; Handler for events
 
@@ -95,7 +76,19 @@
                 (fn [event]
                   (go (>! events-to-send [::player-estimated (estimate event)]))))
 
+(def players (atom {}))
+
+(defn players-component []
+  (println @players)
+  [:ol
+   (for [player @players]
+     ^{:key (first player)} [:li
+                              [:span.name (:name (second player))]
+                              [:span.estimate (:estimate (second player))]])])
+
+(reagent/render-component [players-component] (dom/getElementByClass "players"))
 (go (>! events-to-send [::player-joined (player-name)]))
+
 
 (comment
   (println (dom/getChildren (dom/getElementByClass "players")))

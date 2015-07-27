@@ -34,10 +34,6 @@
   [{uids :any}]
   ((notify uids) ::players-updated @players))
 
-(defn notify-player-estimated
-  [{uids :any} estimate]
-  ((notify uids) ::player-estimated estimate))
-
 (defmulti message-handler :id)
 
 (defn message-handler*
@@ -57,17 +53,14 @@
   :no-op)
 
 (defmethod message-handler :planning-poker.core/player-joined
-  [{:as event-message :keys [?data]}]
-  (let [ring-request (:ring-req event-message)]
-    (swap! players assoc (player-id ring-request) ?data)
-    (notify-players-updated @connected-uids)))
+  [{:keys [?data ring-req]}]
+  (swap! players assoc (player-id ring-req) {:name ?data})
+  (notify-players-updated @connected-uids))
 
 (defmethod message-handler :planning-poker.core/player-estimated
-  [{:as event-message :keys [?data]}]
-  (let [ring-request (:ring-req event-message)]
-    (notify-player-estimated @connected-uids {:player-id (player-id ring-request)
-                                              :estimate ?data})
-    (clojure.pprint/pprint {(player-id ring-request) ?data})))
+  [{:keys [?data ring-req]}]
+  (swap! players assoc-in [(player-id ring-req) :estimate] ?data)
+  (notify-players-updated @connected-uids))
 
 ;; Add your (defmethod message-handler <id> [event-message] <body>)s here...
 

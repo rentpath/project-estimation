@@ -1,6 +1,5 @@
 (ns planning-poker.routes
   (:use [org.httpkit.server :only [run-server]])
-
   (:require [compojure.core :refer :all]
             [compojure.route :as route]
             [planning-poker.views :refer :all]
