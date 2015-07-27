@@ -8,6 +8,7 @@
     [reagent.core :as reagent :refer [atom]])
   (:import
     [goog dom]
+    [goog style]
     [goog window]
     [goog.dom forms]))
 
@@ -76,6 +77,15 @@
                 (fn [event]
                   (go (>! events-to-send [::player-estimated (estimate event)]))))
 
+(gevents/listen (dom/getElementByClass "current-player")
+                goog.events.EventType.SUBMIT
+                (fn [event]
+                  (.preventDefault event)
+                  (let [form (.-currentTarget event)
+                        player-name (forms/getValueByName form "player-name")]
+                    (goog.style.showElement form false)
+                    (go (>! events-to-send [::player-joined player-name])))))
+
 (def players (atom {}))
 
 (defn players-component []
@@ -87,7 +97,7 @@
                               [:span.estimate (:estimate (second player))]])])
 
 (reagent/render-component [players-component] (dom/getElementByClass "players"))
-(go (>! events-to-send [::player-joined (player-name)]))
+; (go (>! events-to-send [::player-joined (player-name)]))
 
 
 (comment
