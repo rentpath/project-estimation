@@ -12,7 +12,7 @@
 (defn voting-page []
   (html5
    [:head
-    [:title "Estimation"]
+    [:title "Remote Planning Poker"]
     (include-css "/stylesheets/styles.css")]
    [:body
     [:form.login
@@ -21,8 +21,7 @@
       [:input {:name "player-name" :placeholder "Your Name" :autofocus true}]
       [:button "Start Playing"]]]
     [:div.game-room
-     [:h1 "Estimates"]
-     [:h2 "Cards"]
+     [:h1 "Planning Poker"]
      [:ol.cards
       (for [x ["?" 0 1 2 3 5 8 13 20]]
         [:li
