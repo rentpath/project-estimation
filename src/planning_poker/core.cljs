@@ -82,6 +82,11 @@
                     (goog.style.showElement form false)
                     (go (>! events-to-send [::player-joined player-name])))))
 
+(gevents/listen (dom/getElementByClass "reset")
+                goog.events.EventType.CLICK
+                (fn [event]
+                  (go (>! events-to-send [::new-round-requested]))))
+
 (def players (atom {}))
 
 (defn players-component []

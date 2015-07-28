@@ -74,11 +74,11 @@ h2 {
 .cards {
   list-style-type: none;
   padding: 0;
-  width: 600px;
+  max-width: 600px;
   display: inline-block;
 }
 
-.cards button {
+.cards .card {
   height: 200px;
   width: 150px;
   border: 2px solid #2e6da4;
@@ -88,13 +88,13 @@ h2 {
   position: relative;
 }
 
-.cards button:focus {
+.cards .card:focus {
   outline: unset;
   background-color: #2e6da4;
   color: #fff;
 }
 
-.cards button::before {
+.cards .card::before {
   content: "♠";
   font-size: 24px;
   position: absolute;
@@ -102,7 +102,7 @@ h2 {
   left: 10px;
 }
 
-.cards button::after {
+.cards .card::after {
   content: "♠";
   position: absolute;
   bottom: 5px;
@@ -149,4 +149,15 @@ h2 {
 .estimate {
   display: inline-block;
   width: 50px;
+}
+
+.reset {
+  background-color: #337ab7;
+  border: 1px solid #2e6da4;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 18px;
+  height: 45px;
+  padding: 0 10px;
+  margin-top: 20px;
 }

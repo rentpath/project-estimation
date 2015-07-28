@@ -38,6 +38,10 @@
   [{uids :any}]
   ((notify uids) ::players-updated @players))
 
+(defn notify-new-round-started
+  [{uids :any}]
+  ((notify uids) ::players-updated @players))
+
 (defn player-names
   [players]
   (reduce (fn [accumulator [player-id player-data]]
@@ -83,7 +87,10 @@
   (when (all-players-estimated? @players)
     (notify-players-estimated @connected-uids)))
 
-;; Add your (defmethod message-handler <id> [event-message] <body>)s here...
+(defmethod message-handler :planning-poker.core/new-round-requested
+  [data]
+  (reset! players (player-names @players))
+  (notify-new-round-started @connected-uids))
 
 (sente/start-chsk-router! ch-chsk message-handler*)
 
