@@ -1,15 +1,26 @@
 body {
   font-family: sans-serif;
   color: #333;
+  padding-left: 20px;
+}
+
+h1 {
+  font-size: 36px;
+}
+
+h2 {
+  font-size: 32px;
+  margin: 0 0 20px 0;
 }
 
 .login {
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.8);
   position: absolute;
   top: 0;
   right: 0;
   bottom: 0;
   left: 0;
+  z-index: 10;
 }
 
 .login fieldset {
@@ -64,6 +75,7 @@ body {
   list-style-type: none;
   padding: 0;
   width: 600px;
+  display: inline-block;
 }
 
 .cards button {
@@ -101,4 +113,40 @@ body {
 .cards li {
   display: inline-block;
   margin: 0 20px 20px 0;
+}
+
+.players {
+  display: inline-block;
+  vertical-align: top;
+}
+
+.players ul {
+  padding-left: 0;
+  margin: 0;
+  line-height: 64px;
+  font-size: 32px;
+  list-style-type: none;
+}
+
+.players li {
+  border-bottom: 1px solid #ddd;
+}
+
+.players li:first-of-type {
+  border-top: 1px solid #ddd;
+}
+
+.players li::before {
+  content: "♠";
+  margin-right: 10px;
+}
+
+.name {
+  display: inline-block;
+  width: 200px;
+}
+
+.estimate {
+  display: inline-block;
+  width: 50px;
 }

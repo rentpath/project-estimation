@@ -85,15 +85,13 @@
 (def players (atom {}))
 
 (defn players-component []
-  (println @players)
-  [:ol
+  [:ul
    (for [player @players]
      ^{:key (first player)} [:li
-                              [:span.name (:name (second player))]
-                              [:span.estimate (:estimate (second player))]])])
+                             [:span.name (:name (second player))]
+                             [:span.estimate (:estimate (second player))]])])
 
-(reagent/render-component [players-component] (dom/getElementByClass "players"))
-
+(reagent/render-component [players-component] (dom/getElementByClass "names"))
 
 (comment
   (println (dom/getChildren (dom/getElementByClass "players")))

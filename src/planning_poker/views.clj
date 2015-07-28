@@ -26,6 +26,7 @@
       (for [x ["?" 0 1 2 3 5 8 13 20]]
         [:li
          [:button x]])]
-     [:h2 "Players"]
-     [:div.players]]
+     [:div.players
+      [:h2 "Players"]
+      [:div.names]]]
     [:script {:src "javascript/main.js"}]]))
