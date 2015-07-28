@@ -12,18 +12,21 @@
 (defn voting-page []
   (html5
    [:head
-    [:title "Estimation"]]
+    [:title "Estimation"]
+    (include-css "/stylesheets/styles.css")]
    [:body
-    [:h1 "Estimates"]
-    [:form.current-player
-     [:label "Name: "
-      [:input {:name "player-name"}]]
-     [:input {:type "submit"}]]
-    [:h2 "Cards"]
-    [:ol.cards
-     (for [x ["?" 0 1 2 3 5 8 13 20]]
-       [:li
-        [:button x]])]
-    [:h2 "Players"]
-    [:div.players]
+    [:form.login
+     [:fieldset
+      [:p "Planning Poker"]
+      [:input {:name "player-name" :placeholder "Your Name" :autofocus true}]
+      [:button "Start Playing"]]]
+    [:div.game-room
+     [:h1 "Estimates"]
+     [:h2 "Cards"]
+     [:ol.cards
+      (for [x ["?" 0 1 2 3 5 8 13 20]]
+        [:li
+         [:button x]])]
+     [:h2 "Players"]
+     [:div.players]]
     [:script {:src "javascript/main.js"}]]))

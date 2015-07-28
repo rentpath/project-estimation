@@ -73,7 +73,7 @@
                 (fn [event]
                   (go (>! events-to-send [::player-estimated (estimate event)]))))
 
-(gevents/listen (dom/getElementByClass "current-player")
+(gevents/listen (dom/getElementByClass "login")
                 goog.events.EventType.SUBMIT
                 (fn [event]
                   (.preventDefault event)
