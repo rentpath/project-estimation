@@ -64,10 +64,6 @@
 
 (sente/start-chsk-router! ch-chsk message-handler*)
 
-(defn player-name
-  []
-  (forms/getValue (dom/getElementByClass "name")))
-
 (defn estimate
   [event]
   (-> event .-target dom/getTextContent))
@@ -97,7 +93,6 @@
                               [:span.estimate (:estimate (second player))]])])
 
 (reagent/render-component [players-component] (dom/getElementByClass "players"))
-; (go (>! events-to-send [::player-joined (player-name)]))
 
 
 (comment

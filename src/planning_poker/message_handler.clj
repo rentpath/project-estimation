@@ -32,7 +32,27 @@
 
 (defn notify-players-updated
   [{uids :any}]
+  ((notify uids) ::players-updated (player-names @players)))
+
+(defn notify-players-estimated
+  [{uids :any}]
   ((notify uids) ::players-updated @players))
+
+(defn player-names
+  [players]
+  (reduce (fn [accumulator [player-id player-data]]
+            (assoc accumulator player-id {:name (:name player-data)}))
+            {}
+            players))
+; (player-names {"a1-b2" {:name "El Guapo" :estimate 3}})
+
+(defn player-estimates
+  [players]
+  (reduce (fn [accumulator [player-id player-data]]
+            (assoc accumulator player-id {:estimate (:estimate player-data)}))
+            {}
+            players))
+; (player-estimates {"a1-b2" {:name "El Guapo" :estimate 3}})
 
 (defmulti message-handler :id)
 
@@ -60,11 +80,25 @@
 (defmethod message-handler :planning-poker.core/player-estimated
   [{:keys [?data ring-req]}]
   (swap! players assoc-in [(player-id ring-req) :estimate] ?data)
-  (notify-players-updated @connected-uids))
+  (when (all-players-estimated? @players)
+    (notify-players-estimated @connected-uids)))
 
 ;; Add your (defmethod message-handler <id> [event-message] <body>)s here...
 
 (sente/start-chsk-router! ch-chsk message-handler*)
+
+(defn player-estimated?
+  [player]
+  (boolean (:estimate (first (vals player)))))
+; (player-estimated? {"a1-b2" {:name "El Guapo" :estimate 3}})
+; (player-estimated? {"a1-b2" {:name "El Guapo"}})
+
+; We expect parameter to be in this format: {"a1-b2" {:name "El Guapo" :estimate 3}}
+(defn all-players-estimated?
+  [players]
+  (every? true? (map (fn [[id player-data]] (player-estimated? {id player-data})) players)))
+; (all-players-estimated? {"a1-b2" {:name "El Guapo" :estimate 3}})
+; (all-players-estimated? {"a1-b2" {:name "El Guapo"}})
 
 (defn uids-to-remove
   [old-connected-uids current-connected-uids]
