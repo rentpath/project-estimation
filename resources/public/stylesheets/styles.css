@@ -33,6 +33,8 @@ h2 {
   left: 50%;
   top: 30%;
   transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+  -moz-transform: translate(-50%, -50%);
 }
 
 .login input {
@@ -45,6 +47,7 @@ h2 {
   padding: 0 10px;
 }
 
+/* ::-moz-placeholder doesn't seem to let us indent the placeholder text */
 .login ::-webkit-input-placeholder {
   text-indent: 3px;
 }
@@ -78,7 +81,12 @@ h2 {
   display: inline-block;
 }
 
-.cards .card {
+.cards li {
+  display: inline-block;
+  margin: 0 20px 20px 0;
+}
+
+.card {
   height: 200px;
   width: 150px;
   border: 2px solid #2e6da4;
@@ -88,13 +96,18 @@ h2 {
   position: relative;
 }
 
-.cards .card:focus {
+.card:focus {
   outline: unset;
   background-color: #2e6da4;
   color: #fff;
 }
 
-.cards .card::before {
+.card.active {
+  background-color: #2e6da4;
+  color: #fff;
+}
+
+.card::before {
   content: "♠";
   font-size: 24px;
   position: absolute;
@@ -102,17 +115,12 @@ h2 {
   left: 10px;
 }
 
-.cards .card::after {
+.card::after {
   content: "♠";
   position: absolute;
   bottom: 5px;
   right: 10px;
   font-size: 24px;
-}
-
-.cards li {
-  display: inline-block;
-  margin: 0 20px 20px 0;
 }
 
 .players {
@@ -128,15 +136,15 @@ h2 {
   list-style-type: none;
 }
 
-.players li {
+.player {
   border-bottom: 1px solid #ddd;
 }
 
-.players li:first-of-type {
+.player:first-of-type {
   border-top: 1px solid #ddd;
 }
 
-.players li::before {
+.player.estimated::before {
   content: "♠";
   margin-right: 10px;
 }

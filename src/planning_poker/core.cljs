@@ -73,6 +73,8 @@
 ((defn set-up-event-handlers
   []
   (. ($ ".card") (on "click" (fn [event]
+                               (. ($ ".card") (removeClass "active"))
+                               (. ($ (.-currentTarget event)) (addClass "active"))
                                (go (>! events-to-send [::player-estimated (estimate event)])))))
 
   (. ($ ".login") (on "submit" (fn [event]
@@ -83,6 +85,7 @@
                                    (go (>! events-to-send [::player-joined player-name]))))))
 
   (. ($ ".reset") (on "click" (fn [event]
+                                (. ($ ".card") (removeClass "active"))
                                 (go (>! events-to-send [::new-round-requested])))))))
 
 (def players (atom {}))
@@ -90,7 +93,8 @@
 (defn players-component []
   [:ul
    (for [player @players]
-     ^{:key (first player)} [:li
+     ^{:key (first player)} [:li.player {:class (when (:estimate (second player)) "estimated")}
+
                              [:span.name (:name (second player))]
                              [:span.estimate (:estimate (second player))]])])
 
