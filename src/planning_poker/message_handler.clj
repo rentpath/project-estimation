@@ -20,6 +20,35 @@
   (def chsk-send! send-fn) ; ChannelSocket's send API fn
   (def connected-uids connected-uids)) ; Watchable, read-only atom
 
+(defn player-estimated?
+  [player]
+  (boolean (:estimate (first (vals player)))))
+; (player-estimated? {"a1-b2" {:name "El Guapo" :estimate 3}})
+; (player-estimated? {"a1-b2" {:name "El Guapo"}})
+
+; We expect parameter to be in this format: {"a1-b2" {:name "El Guapo" :estimate 3}}
+(defn all-players-estimated?
+  [players]
+  (every? true? (map (fn [[id player-data]] (player-estimated? {id player-data})) players)))
+; (all-players-estimated? {"a1-b2" {:name "El Guapo" :estimate 3}})
+; (all-players-estimated? {"a1-b2" {:name "El Guapo"}})
+
+(defn player-names
+  [players]
+  (reduce (fn [accumulator [player-id player-data]]
+            (assoc accumulator player-id {:name (:name player-data)}))
+            {}
+            players))
+; (player-names {"a1-b2" {:name "El Guapo" :estimate 3}})
+
+(defn player-estimates
+  [players]
+  (reduce (fn [accumulator [player-id player-data]]
+            (assoc accumulator player-id {:estimate (:estimate player-data)}))
+            {}
+            players))
+; (player-estimates {"a1-b2" {:name "El Guapo" :estimate 3}})
+
 (defn uids
   [connected-uids]
   (:any connected-uids))
@@ -41,22 +70,6 @@
 (defn notify-new-round-started
   [{uids :any}]
   ((notify uids) ::players-updated @players))
-
-(defn player-names
-  [players]
-  (reduce (fn [accumulator [player-id player-data]]
-            (assoc accumulator player-id {:name (:name player-data)}))
-            {}
-            players))
-; (player-names {"a1-b2" {:name "El Guapo" :estimate 3}})
-
-(defn player-estimates
-  [players]
-  (reduce (fn [accumulator [player-id player-data]]
-            (assoc accumulator player-id {:estimate (:estimate player-data)}))
-            {}
-            players))
-; (player-estimates {"a1-b2" {:name "El Guapo" :estimate 3}})
 
 (defmulti message-handler :id)
 
@@ -93,19 +106,6 @@
   (notify-new-round-started @connected-uids))
 
 (sente/start-chsk-router! ch-chsk message-handler*)
-
-(defn player-estimated?
-  [player]
-  (boolean (:estimate (first (vals player)))))
-; (player-estimated? {"a1-b2" {:name "El Guapo" :estimate 3}})
-; (player-estimated? {"a1-b2" {:name "El Guapo"}})
-
-; We expect parameter to be in this format: {"a1-b2" {:name "El Guapo" :estimate 3}}
-(defn all-players-estimated?
-  [players]
-  (every? true? (map (fn [[id player-data]] (player-estimated? {id player-data})) players)))
-; (all-players-estimated? {"a1-b2" {:name "El Guapo" :estimate 3}})
-; (all-players-estimated? {"a1-b2" {:name "El Guapo"}})
 
 (defn uids-to-remove
   [old-connected-uids current-connected-uids]

@@ -2,10 +2,12 @@
   (:require-macros
     [cljs.core.async.macros :as a :refer (go go-loop)])
   (:require
+    [cljsjs.jquery]
     [cljs.core.async :as a :refer (<! >! put! chan)]
     [taoensso.sente :as sente :refer (cb-success?)]
     [goog.events :as gevents]
     [reagent.core :as reagent :refer [atom]])
+  (:use [jayq.core :only [$ css html]])
   (:import
     [goog dom]
     [goog style]
@@ -68,24 +70,20 @@
   [event]
   (-> event .-target dom/getTextContent))
 
-(gevents/listen (dom/getElementByClass "cards")
-                goog.events.EventType.CLICK
-                (fn [event]
-                  (go (>! events-to-send [::player-estimated (estimate event)]))))
+((defn set-up-event-handlers
+  []
+  (. ($ ".card") (on "click" (fn [event]
+                               (go (>! events-to-send [::player-estimated (estimate event)])))))
 
-(gevents/listen (dom/getElementByClass "login")
-                goog.events.EventType.SUBMIT
-                (fn [event]
-                  (.preventDefault event)
-                  (let [form (.-currentTarget event)
-                        player-name (forms/getValueByName form "player-name")]
-                    (goog.style.showElement form false)
-                    (go (>! events-to-send [::player-joined player-name])))))
+  (. ($ ".login") (on "submit" (fn [event]
+                                 (.preventDefault event)
+                                 (let [form (.-currentTarget event)
+                                       player-name (forms/getValueByName form "player-name")]
+                                   (goog.style.showElement form false)
+                                   (go (>! events-to-send [::player-joined player-name]))))))
 
-(gevents/listen (dom/getElementByClass "reset")
-                goog.events.EventType.CLICK
-                (fn [event]
-                  (go (>! events-to-send [::new-round-requested]))))
+  (. ($ ".reset") (on "click" (fn [event]
+                                (go (>! events-to-send [::new-round-requested])))))))
 
 (def players (atom {}))
 

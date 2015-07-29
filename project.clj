@@ -7,6 +7,8 @@
                  [compojure "1.4.0"]
                  [hiccup "1.0.5"]
                  [http-kit "2.0.0"]
+                 [jayq "2.5.4"]
+                 [cljsjs/jquery "1.9.0-0"]
                  [org.clojure/clojure "1.7.0"]
                  [org.clojure/clojurescript "0.0-3308"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
