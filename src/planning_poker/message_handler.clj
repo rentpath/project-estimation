@@ -20,19 +20,6 @@
   (def chsk-send! send-fn) ; ChannelSocket's send API fn
   (def connected-uids connected-uids)) ; Watchable, read-only atom
 
-(defn player-estimated?
-  [player]
-  (boolean (:estimate (first (vals player)))))
-; (player-estimated? {"a1-b2" {:name "El Guapo" :estimate 3}})
-; (player-estimated? {"a1-b2" {:name "El Guapo"}})
-
-; We expect parameter to be in this format: {"a1-b2" {:name "El Guapo" :estimate 3}}
-(defn all-players-estimated?
-  [players]
-  (every? true? (map (fn [[id player-data]] (player-estimated? {id player-data})) players)))
-; (all-players-estimated? {"a1-b2" {:name "El Guapo" :estimate 3}})
-; (all-players-estimated? {"a1-b2" {:name "El Guapo"}})
-
 (defn player-names
   [players]
   (reduce (fn [accumulator [player-id player-data]]
@@ -40,14 +27,6 @@
             {}
             players))
 ; (player-names {"a1-b2" {:name "El Guapo" :estimate 3}})
-
-(defn player-estimates
-  [players]
-  (reduce (fn [accumulator [player-id player-data]]
-            (assoc accumulator player-id {:estimate (:estimate player-data)}))
-            {}
-            players))
-; (player-estimates {"a1-b2" {:name "El Guapo" :estimate 3}})
 
 (defn uids
   [connected-uids]
@@ -61,7 +40,7 @@
 
 (defn notify-players-updated
   [{uids :any}]
-  ((notify uids) ::players-updated (player-names @players)))
+  ((notify uids) ::players-updated @players))
 
 (defn notify-players-estimated
   [{uids :any}]
@@ -92,12 +71,14 @@
 (defmethod message-handler :planning-poker.core/player-joined
   [{:keys [?data ring-req]}]
   (swap! players assoc (player-id ring-req) {:name ?data})
+  (println players)
   (notify-players-updated @connected-uids))
 
 (defmethod message-handler :planning-poker.core/player-estimated
   [{:keys [?data ring-req]}]
   (swap! players assoc-in [(player-id ring-req) :estimate] ?data)
-  (when (all-players-estimated? @players)
+  (notify-players-estimated @connected-uids)
+  #_(when (all-players-estimated? @players)
     (notify-players-estimated @connected-uids)))
 
 (defmethod message-handler :planning-poker.core/new-round-requested

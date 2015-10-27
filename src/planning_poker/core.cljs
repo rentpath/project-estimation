@@ -70,6 +70,19 @@
   [event]
   (-> event .-target dom/getTextContent))
 
+(defn player-estimated?
+  [player]
+  (println (:estimate player))
+  (boolean (:estimate player)))
+; (player-estimated? {:name "El Guapo" :estimate 3})
+; (player-estimated? {:name "El Guapo"})
+
+(defn all-players-estimated?
+  [players]
+  (every? true? (map (fn [player] (player-estimated? player)) players)))
+; (all-players-estimated? {:name "El Guapo" :estimate 3})
+; (all-players-estimated? {:name "El Guapo"})
+
 ((defn set-up-event-handlers
   []
   (. ($ ".card") (on "click" (fn [event]
@@ -91,12 +104,14 @@
 (def players (atom {}))
 
 (defn players-component []
+  (println @players)
   [:ul
-   (for [player @players]
-     ^{:key (first player)} [:li.player {:class (when (:estimate (second player)) "estimated")}
-
-                             [:span.name (:name (second player))]
-                             [:span.estimate (:estimate (second player))]])])
+   (doall (for [[player-id player] @players]
+            ^{:key player-id} [:li.player
+                               [:span.name (:name player)]
+                               [:span.estimate (cond (all-players-estimated? @players) (:estimate player)
+                                                     (player-estimated? player) "done"
+                                                     :else "waiting")]]))])
 
 (reagent/render-component [players-component] (dom/getElementByClass "names"))
 
