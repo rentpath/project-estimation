@@ -12,7 +12,11 @@ You will need [Leiningen][] 2.0.0 or above installed.
 
 To start a web server for the application, run:
 
-    lein ring server
+    lein run main
+
+Then, load localhost:8080 in your web browser.
+
+If you use ngrok, make sure your web server configuration allows you to access the app at 127.0.0.1:8080.
 
 ## License
 

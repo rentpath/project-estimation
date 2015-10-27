@@ -10,7 +10,7 @@
 
 (defroutes app-routes
   (GET "/" [] (index-page))
-  (GET  "/chsk" req (ring-ajax-get-or-ws-handshake req))
+  (GET "/chsk" req (ring-ajax-get-or-ws-handshake req))
   (POST "/chsk" req (ring-ajax-post req))
   (GET "/:game-number" [] (voting-page))
   (route/not-found "Not Found"))
