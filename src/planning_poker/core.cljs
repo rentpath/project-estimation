@@ -79,7 +79,10 @@
 
 (defn all-players-estimated?
   [players]
-  (every? true? (map (fn [player] (player-estimated? player)) players)))
+  (every? true? (reduce
+                  (fn [accumulator player] (conj accumulator (player-estimated? (second player))))
+                  []
+                  players)))
 ; (all-players-estimated? {:name "El Guapo" :estimate 3})
 ; (all-players-estimated? {:name "El Guapo"})
 
