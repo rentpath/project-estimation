@@ -6,7 +6,7 @@
     [cljs.core.async :as a :refer (<! >! put! chan)]
     [taoensso.sente :as sente :refer (cb-success?)]
     [goog.events :as gevents]
-    [reagent.core :as reagent :refer [atom]])
+    [reagent.core :as r :refer [render]])
   (:use [jayq.core :only [$ css html]])
   (:import
     [goog dom]
@@ -79,7 +79,7 @@
 ; (all-players-estimated? {"abc-def" {:name "El Guapo" :estimate 3}})
 ; (all-players-estimated? {"abc-def" {:name "El Guapo"}})
 
-((defn set-up-event-handlers
+(defn set-up-event-handlers
   []
   (. ($ ".card") (on "click" (fn [event]
                                (. ($ ".card") (removeClass "active"))
@@ -95,20 +95,41 @@
 
   (. ($ ".reset") (on "click" (fn [event]
                                 (. ($ ".card") (removeClass "active"))
-                                (go (>! events-to-send [::new-round-requested])))))))
+                                (go (>! events-to-send [::new-round-requested]))))))
 
-(def players (atom {}))
+(defonce players (r/atom {}))
 
-(defn players-component []
-  [:ul
-   (doall (for [[player-id player] @players]
-            ^{:key player-id} [:li.player
-                               [:span.name (:name player)]
-                               [:span.estimate (cond (all-players-estimated? @players) (:estimate player)
-                                                     (:estimate player) "done"
-                                                     :else "waiting")]]))])
+(defn estimated-players
+  [players]
+  (reduce-kv
+    (fn [acc k v]
+      (assoc acc k (assoc v :show-estimate? true)))
+    {}
+    players))
 
-(reagent/render-component [players-component] (dom/getElementByClass "names"))
+(defn player-component
+  [player]
+  [:li.player
+   [:span.name (:name player)]
+   [:span.estimate (cond
+                     (:show-estimate? player) (:estimate player)
+                     (:estimate player) "done"
+                     :else "waiting")]])
+
+(defn players-component
+  [players]
+  (fn []
+    (when (all-players-estimated? @players) (swap! players estimated-players))
+    [:ul
+     (for [[player-id player] @players]
+       ^{:key player-id} [player-component player])]))
+
+(defn main
+  []
+  (render [(players-component players)] (dom/getElementByClass "names"))
+  (set-up-event-handlers))
+
+(main)
 
 (comment
   (println (dom/getChildren (dom/getElementByClass "players"))))
