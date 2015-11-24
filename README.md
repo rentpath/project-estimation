@@ -20,7 +20,7 @@ To automatically compile assets when you change a file, run:
 
 To start a web server for the application, run:
 
-    lein run main
+    lein run
 
 Then, load http://localhost:8080 in your web browser.
 

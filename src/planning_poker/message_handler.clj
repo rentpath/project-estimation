@@ -48,7 +48,7 @@
 
 (defn notify-new-round-started
   [{uids :any}]
-  ((notify uids) ::players-updated @players))
+  ((notify uids) ::new-round-started @players))
 
 (defmulti message-handler :id)
 
@@ -71,7 +71,6 @@
 (defmethod message-handler :planning-poker.core/player-joined
   [{:keys [?data ring-req]}]
   (swap! players assoc (player-id ring-req) {:name ?data})
-  (println players)
   (notify-players-updated @connected-uids))
 
 (defmethod message-handler :planning-poker.core/player-estimated

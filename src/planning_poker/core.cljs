@@ -32,8 +32,12 @@
 ;; [:chsk/recv [:planning-poker.routes/players-updated {"a13-18-434-a62-2f5df" {:name "Michael"}}]]
 (defmethod payload-handler :planning-poker.message-handler/players-updated
   [[_ [_ data]]]
+  (reset! players data))
+
+(defmethod payload-handler :planning-poker.message-handler/new-round-started
+  [[_ [_ data]]]
   (reset! players data)
-  (println "Custom event from server:" data))
+  (. ($ ".card") (removeClass "active")))
 
 ;; Handler for events
 
@@ -49,7 +53,6 @@
 
 (defmethod message-handler :chsk/handshake
   [message]
-  (println "Handshake" message)
   (go
     (loop []
       (let [event (<! events-to-send)]
@@ -119,5 +122,4 @@
 (reagent/render-component [players-component] (dom/getElementByClass "names"))
 
 (comment
-  (println (dom/getChildren (dom/getElementByClass "players")))
-  )
+  (println (dom/getChildren (dom/getElementByClass "players"))))
