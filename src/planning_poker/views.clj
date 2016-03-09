@@ -15,19 +15,5 @@
     [:title "Remote Planning Poker"]
     (include-css "/stylesheets/styles.css")]
    [:body
-    [:form.login
-     [:fieldset
-      [:p "Planning Poker"]
-      [:input {:name "player-name" :placeholder "Your Name" :autofocus true}]
-      [:button "Start Playing"]]]
-    [:div.game-room
-     [:h1 "Planning Poker"]
-     [:ol.cards
-      (for [x ["?" 0 1 2 3 5 8 13 20]]
-        [:li
-         [:button.card x]])]
-     [:div.players
-      [:h2 "Players"]
-      [:div.names]
-      [:button.reset "Play a New Round"]]]
-    [:script {:src "javascript/main.js"}]]))
+    [:div.app
+     [:script {:src "javascript/main.js"}]]]))

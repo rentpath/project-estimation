@@ -68,19 +68,19 @@
   [event]
   :no-op)
 
-(defmethod message-handler :planning-poker.core/player-joined
+(defmethod message-handler :planning-poker.client.core/player-joined
   [{:keys [?data ring-req]}]
   (swap! players assoc (player-id ring-req) {:name ?data})
   (notify-players-updated @connected-uids))
 
-(defmethod message-handler :planning-poker.core/player-estimated
+(defmethod message-handler :planning-poker.client.core/player-estimated
   [{:keys [?data ring-req]}]
   (swap! players assoc-in [(player-id ring-req) :estimate] ?data)
   (notify-players-estimated @connected-uids)
   #_(when (all-players-estimated? @players)
     (notify-players-estimated @connected-uids)))
 
-(defmethod message-handler :planning-poker.core/new-round-requested
+(defmethod message-handler :planning-poker.client.core/new-round-requested
   [data]
   (reset! players (player-names @players))
   (notify-new-round-started @connected-uids))

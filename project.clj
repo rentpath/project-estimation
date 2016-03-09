@@ -7,8 +7,6 @@
                  [compojure "1.4.0"]
                  [hiccup "1.0.5"]
                  [http-kit "2.0.0"]
-                 [jayq "2.5.4"]
-                 [cljsjs/jquery "1.9.0-0"]
                  [org.clojure/clojure "1.7.0"]
                  [org.clojure/clojurescript "1.7.145"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
@@ -29,7 +27,7 @@
   :cljsbuild {
     :builds [{:id "planning-poker"
               :source-paths ["src"]
-              :compiler {:main planning-poker.core
+              :compiler {:main planning-poker.client.core
                          :asset-path "javascript"
                          :output-to "resources/public/javascript/main.js"
                          :output-dir "resources/public/javascript"
