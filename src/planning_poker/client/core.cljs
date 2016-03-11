@@ -25,16 +25,17 @@
 
 (enable-console-print!)
 
-(defmulti payload-handler (comp first second))
+(defmulti payload-handler
+  (fn [message players] (-> message second first)))
 
 ;; Initial parameter is in this format:
 ;; [:chsk/recv [:planning-poker.routes/players-updated {"a13-18-434-a62-2f5df" {:name "Michael"}}]]
 (defmethod payload-handler :planning-poker.message-handler/players-updated
-  [[_ [_ data]]]
+  [[_ [_ data]] players]
   (reset! players data))
 
 (defmethod payload-handler :planning-poker.message-handler/new-round-started
-  [[_ [_ data]]]
+  [[_ [_ data]] players]
   (reset! players data)
   (deactivate-all-cards))
 
@@ -42,16 +43,17 @@
 
 ;; Wrap for logging, catching, etc.:
 (defn message-handler* [{:as ev-message :keys [event]}]
-  (message-handler event))
+  (message-handler event players))
 
-(defmulti message-handler first)
+(defmulti message-handler
+  (fn [message players] (first message)))
 
 (defmethod message-handler :default
-  [message]
+  [message _]
   (println "Unhandled event:" (first message)))
 
 (defmethod message-handler :chsk/handshake
-  [message]
+  [message _]
   (go
     (loop []
       (let [event (<! events-to-send)]
@@ -59,12 +61,12 @@
       (recur))))
 
 (defmethod message-handler :chsk/state
-  [message]
+  [message _]
   (println "State" message))
 
 (defmethod message-handler :chsk/recv
-  [message]
-  (payload-handler message))
+  [message players]
+  (payload-handler message players))
 
 (sente/start-chsk-router! ch-chsk message-handler*)
 
