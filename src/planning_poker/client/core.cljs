@@ -2,13 +2,16 @@
   (:require-macros [cljs.core.async.macros :as a :refer (go go-loop)])
   (:require [cljs.core.async :as a :refer (<! >! put! chan)]
             [taoensso.sente :as sente :refer (cb-success?)]
-            [goog.events :as gevents]
             [reagent.core :as r :refer [render]]
-            [planning-poker.client.form-parser :refer [value]])
-  (:import [goog dom]
-           [goog style]
-           [goog window]
-           [goog.dom forms]))
+            [planning-poker.client.form-parser :refer [value]]))
+
+(extend-type js/HTMLCollection
+  ISeqable
+  (-seq [array] (array-seq array 0)))
+
+(extend-type js/NodeList
+  ISeqable
+  (-seq [array] (array-seq array 0)))
 
 (def events-to-send (chan))
 
@@ -76,7 +79,7 @@
 
 (defn deactivate-all-cards
   []
-  (let [cards (array-seq (.querySelectorAll js/document ".card"))]
+  (let [cards (.getElementsByClassName js/document "card")]
     (doseq [card cards]
       (-> card .-classList (.remove "active")))))
 
@@ -125,7 +128,7 @@
   [event]
   (.preventDefault event)
   (let [form (.closest (.-currentTarget event) "form")]
-    (goog.style.showElement form false)
+    (aset form "style" "display" "none")
     (go (>! events-to-send [::player-joined @login-name]))))
 
 (defn login-component
@@ -161,8 +164,8 @@
 
 (defn main
   []
-  (render [root-component players] (dom/getElementByClass "app"))
-  (render [(players-component players)] (dom/getElementByClass "names"))
+  (render [root-component players] (first (.getElementsByClassName js/document "app")))
+  (render [(players-component players)] (first (.getElementsByClassName js/document "names")))
 )
 
 (main)
