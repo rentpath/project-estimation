@@ -3,6 +3,7 @@
   (:require [cljs.core.async :as a :refer (<! >! put! chan)]
             [taoensso.sente :as sente :refer (cb-success?)]
             [reagent.core :as r :refer [render]]
+            [planning-poker.client.payload-handler :as payload-handler]
             [planning-poker.client.form-parser :refer [value]]))
 
 (extend-type js/HTMLCollection
@@ -24,20 +25,6 @@
   (def chsk-state state)) ; Watchable, read-only atom
 
 (enable-console-print!)
-
-(defmulti payload-handler
-  (fn [message players] (-> message second first)))
-
-;; Initial parameter is in this format:
-;; [:chsk/recv [:planning-poker.routes/players-updated {"a13-18-434-a62-2f5df" {:name "Michael"}}]]
-(defmethod payload-handler :planning-poker.message-handler/players-updated
-  [[_ [_ data]] players]
-  (reset! players data))
-
-(defmethod payload-handler :planning-poker.message-handler/new-round-started
-  [[_ [_ data]] players]
-  (reset! players data)
-  (deactivate-all-cards))
 
 ;; Handler for events
 
@@ -66,7 +53,7 @@
 
 (defmethod message-handler :chsk/recv
   [message players]
-  (payload-handler message players))
+  (payload-handler/process! message players deactivate-all-cards))
 
 (sente/start-chsk-router! ch-chsk message-handler*)
 
