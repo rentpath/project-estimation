@@ -27,7 +27,7 @@
   :cljsbuild {
     :builds [{:id "planning-poker"
               :source-paths ["src"]
-              :compiler {:main planning-poker.client.core
+              :compiler {:main "planning-poker.client.core"
                          :asset-path "javascript"
                          :output-to "resources/public/javascript/main.js"
                          :output-dir "resources/public/javascript"
