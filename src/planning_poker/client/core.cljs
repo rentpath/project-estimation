@@ -3,7 +3,8 @@
   (:require [cljs.core.async :as a :refer (<! >! put! chan)]
             [taoensso.sente :as sente :refer (cb-success?)]
             [reagent.core :as r :refer [render]]
-            [planning-poker.client.payload-handler :as payload-handler]
+            [planning-poker.client.card-state :refer [deactivate-all-cards change-active-card]]
+            [planning-poker.client.message-handler :as message-handler]
             [planning-poker.client.form-parser :refer [value]]))
 
 (extend-type js/HTMLCollection
@@ -26,36 +27,14 @@
 
 (enable-console-print!)
 
-;; Handler for events
+(defn handle-message [{:as ev-message :keys [event]}]
+  (message-handler/process! event
+                            players
+                            {:event event
+                             :events-to-send events-to-send
+                             :send-fn chsk-send!}))
 
-;; Wrap for logging, catching, etc.:
-(defn message-handler* [{:as ev-message :keys [event]}]
-  (message-handler event players))
-
-(defmulti message-handler
-  (fn [message players] (first message)))
-
-(defmethod message-handler :default
-  [message _]
-  (println "Unhandled event:" (first message)))
-
-(defmethod message-handler :chsk/handshake
-  [message _]
-  (go
-    (loop []
-      (let [event (<! events-to-send)]
-        (chsk-send! event))
-      (recur))))
-
-(defmethod message-handler :chsk/state
-  [message _]
-  (println "State" message))
-
-(defmethod message-handler :chsk/recv
-  [message players]
-  (payload-handler/process! message players deactivate-all-cards))
-
-(sente/start-chsk-router! ch-chsk message-handler*)
+(sente/start-chsk-router! ch-chsk handle-message)
 
 (defn all-players-estimated?
   [players]
@@ -65,19 +44,6 @@
   [event]
   (let [estimate (-> event .-target .-textContent)]
     (go (>! events-to-send [::player-estimated estimate]))))
-
-(defn deactivate-all-cards
-  []
-  (let [cards (.getElementsByClassName js/document "card")]
-    (doseq [card cards]
-      (-> card .-classList (.remove "active")))))
-
-(defn change-active-card
-  [event]
-  (deactivate-all-cards)
-  (let [card (.-currentTarget event)]
-    (-> card .-classList (.add "active"))
-    (notify-estimate event)))
 
 (defn start-new-round
   [event]
@@ -120,6 +86,11 @@
     (aset form "style" "display" "none")
     (go (>! events-to-send [::player-joined @login-name]))))
 
+(defn select-card
+  [event]
+  (change-active-card event)
+  (notify-estimate event))
+
 (defn login-component
   []
   (let [update-login-name (fn [evt] (reset! login-name (value evt)))]
@@ -137,7 +108,7 @@
   [:ol.cards
    (for [x ["?" 0 1 2 3 5 8 13 20]]
      ^{:key x} [:li
-                [:button.card {:on-click change-active-card} x]])])
+                [:button.card {:on-click select-card} x]])])
 
 (defn root-component
   [players]
@@ -154,8 +125,7 @@
 (defn main
   []
   (render [root-component players] (first (.getElementsByClassName js/document "app")))
-  (render [(players-component players)] (first (.getElementsByClassName js/document "names")))
-)
+  (render [(players-component players)] (first (.getElementsByClassName js/document "names"))))
 
 (main)
 
