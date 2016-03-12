@@ -1,9 +1,9 @@
 (ns planning-poker.client.core
-  (:require-macros [cljs.core.async.macros :as a :refer (go go-loop)])
-  (:require [cljs.core.async :as a :refer (<! >! put! chan)]
-            [taoensso.sente :as sente :refer (cb-success?)]
+  (:require-macros [cljs.core.async.macros :refer (go go-loop)])
+  (:require [cljs.core.async :refer (>! chan)]
+            [taoensso.sente :as sente]
             [reagent.core :as r :refer [render]]
-            [planning-poker.client.card-state :refer [deactivate-all-cards change-active-card]]
+            [planning-poker.client.card-state :refer [change-active-card]]
             [planning-poker.client.message-handler :as message-handler]
             [planning-poker.client.form-parser :refer [value]]))
 
@@ -17,13 +17,11 @@
 
 (def events-to-send (chan))
 
-(let [{:keys [chsk ch-recv send-fn state]}
+(let [{:keys [ch-recv send-fn state]}
       (sente/make-channel-socket! "/chsk"
                                   {:type :auto})]
-  (def chsk chsk)
   (def ch-chsk ch-recv) ; ChannelSocket's receive channel
-  (def chsk-send! send-fn) ; ChannelSocket's send API fn
-  (def chsk-state state)) ; Watchable, read-only atom
+  (def chsk-send! send-fn)) ; ChannelSocket's send API fn
 
 (enable-console-print!)
 
@@ -49,6 +47,7 @@
   [event]
   (go (>! events-to-send [::new-round-requested])))
 
+(defonce login-name (r/atom ""))
 (defonce players (r/atom {}))
 
 (defn estimated-players
@@ -58,26 +57,6 @@
       (assoc acc k (assoc v :show-estimate? true)))
     {}
     players))
-
-(defn player-component
-  [player]
-  [:li.player
-   [:span.name (:name player)]
-   [:span.estimate (cond
-                     (:show-estimate? player) (:estimate player)
-                     (:estimate player) "done"
-                     :else "waiting")]])
-
-;; Do we need to pass in players here?
-(defn players-component
-  [players]
-  (fn []
-    (when (all-players-estimated? @players) (swap! players estimated-players))
-    [:ul
-     (for [[player-id player] @players]
-       ^{:key player-id} [player-component player])]))
-
-(def login-name (r/atom ""))
 
 (defn login
   [event]
@@ -99,7 +78,6 @@
       [:p "Planning Poker"]
       [:input {:name "player-name"
                :placeholder "Your Name"
-               :autofocus true
                :on-change update-login-name}]
       [:button {:on-click login} "Start Playing"]]]))
 
@@ -110,6 +88,26 @@
      ^{:key x} [:li
                 [:button.card {:on-click select-card} x]])])
 
+(defn player-component
+  [player]
+  [:li.player
+   [:span.name (:name player)]
+   [:span.estimate (cond
+                     (:show-estimate? player) (:estimate player)
+                     (:estimate player) "Done"
+                     :else "Waiting")]])
+
+(defn players-component
+  [players]
+  (when (all-players-estimated? @players)
+    (swap! players estimated-players))
+  [:div.players
+   [:h2 "Players"]
+   [:div.names
+    [:ul
+     (for [[player-id player] @players]
+       ^{:key player-id} [player-component player])]]])
+
 (defn root-component
   [players]
   [:div
@@ -117,15 +115,12 @@
    [:div.game-room
     [:h1 "Planning Poker"]
     [cards-component]
-    [:div.players
-     [:h2 "Players"]
-     [:div.names]
-     [:button.reset {:on-click start-new-round} "Play a New Round"]]]])
+    [players-component players]
+    [:button.reset {:on-click start-new-round} "Play a New Round"]]])
 
 (defn main
   []
-  (render [root-component players] (first (.getElementsByClassName js/document "app")))
-  (render [(players-component players)] (first (.getElementsByClassName js/document "names"))))
+  (render [root-component players] (first (.getElementsByClassName js/document "app"))))
 
 (main)
 
