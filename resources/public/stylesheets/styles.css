@@ -1,3 +1,4 @@
+/* Global Styles */
 body {
   font-family: sans-serif;
   color: #333;
@@ -12,6 +13,29 @@ h2 {
   font-size: 32px;
   margin: 0 0 20px 0;
 }
+
+button {
+  cursor: pointer;
+}
+
+/* Home Page */
+.new-game {
+  background-color: #337ab7;
+  border: 1px solid #2e6da4;
+  border-radius: 8px;
+  color: #fff;
+  display: inline-block;
+  font-size: 24px;
+  margin: 15px 0 40px;
+  padding: 16px 20px;
+  text-decoration: none;
+}
+
+.new-game:hover {
+  background-color: #2c699d;
+}
+
+/* Game Page */
 
 .login {
   background-color: rgba(0, 0, 0, 0.8);
@@ -66,6 +90,10 @@ h2 {
   height: 45px;
   margin-left: -1px;
   padding: 0 10px;
+}
+
+.login button:hover {
+  background-color: #2c699d;
 }
 
 .login p {
@@ -151,7 +179,7 @@ h2 {
 
 .estimate {
   display: inline-block;
-  width: 50px;
+  width: 110px;
 }
 
 .reset {
@@ -164,4 +192,8 @@ h2 {
   height: 45px;
   padding: 0 10px;
   margin-top: 20px;
+}
+
+.reset:hover {
+  background-color: #2c699d;
 }

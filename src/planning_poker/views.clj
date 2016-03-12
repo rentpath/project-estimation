@@ -4,11 +4,15 @@
 (defn index-page []
   (html5
    [:head
-    [:title "Remote Planning Poker"]]
+    [:title "Remote Planning Poker"]
+    (include-css "/stylesheets/styles.css")]
    [:body
-    [:h1 "Remote Planning Poker"]
-    [:button "Start a Game"]
-    [:button "Join a Game"]]))
+    [:div.app
+     [:h1 "Remote Planning Poker"]
+     [:a.new-game {:href (str "/" (java.util.UUID/randomUUID))} "Start a Game"]
+
+     [:h2 "Join Existing Game"]
+     [:p "Ask someone on your team for the URL of their planning poker session."]]]))
 
 (defn voting-page []
   (html5
