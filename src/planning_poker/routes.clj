@@ -4,9 +4,8 @@
             [compojure.route :as route]
             [planning-poker.views :refer :all]
             [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
-            [taoensso.sente :as sente]
-            [planning-poker.message-handler :refer :all]
-            [taoensso.sente.server-adapters.http-kit :refer (sente-web-server-adapter)]))
+            [planning-poker.message-handler :refer [ring-ajax-get-or-ws-handshake
+                                                    ring-ajax-post]]))
 
 (defroutes app-routes
   (GET "/" [] (index-page))

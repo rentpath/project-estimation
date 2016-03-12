@@ -4,10 +4,11 @@
 (defn index-page []
   (html5
    [:head
-    [:title "Hello World"]
-    #_(include-css "/css/style.css")]
+    [:title "Remote Planning Poker"]]
    [:body
-    [:h1 "Hello World"]]))
+    [:h1 "Remote Planning Poker"]
+    [:button "Start a Game"]
+    [:button "Join a Game"]]))
 
 (defn voting-page []
   (html5
