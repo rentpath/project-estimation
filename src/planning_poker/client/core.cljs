@@ -5,15 +5,8 @@
             [reagent.core :as r :refer [render]]
             [planning-poker.client.card-state :refer [change-active-card]]
             [planning-poker.client.message-handler :as message-handler]
-            [planning-poker.client.form-parser :refer [value]]))
-
-(extend-type js/HTMLCollection
-  ISeqable
-  (-seq [array] (array-seq array 0)))
-
-(extend-type js/NodeList
-  ISeqable
-  (-seq [array] (array-seq array 0)))
+            [planning-poker.client.form-parser :refer [value]]
+            planning-poker.client.extensions))
 
 (def events-to-send (chan))
 

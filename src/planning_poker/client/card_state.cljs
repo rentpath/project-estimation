@@ -1,12 +1,5 @@
-(ns planning-poker.client.card-state)
-
-(extend-type js/HTMLCollection
-  ISeqable
-  (-seq [array] (array-seq array 0)))
-
-(extend-type js/NodeList
-  ISeqable
-  (-seq [array] (array-seq array 0)))
+(ns planning-poker.client.card-state
+  (:require planning-poker.client.extensions))
 
 (defn deactivate-all-cards
   []
