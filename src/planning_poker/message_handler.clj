@@ -60,7 +60,6 @@
   [{:as event-message :keys [event id ?data ring-req ?reply-fn send-fn]}]
   (let [session (:session ring-req)
         uid (:uid session)]
-    (println "Unhandled event: %s" event)
     (when ?reply-fn
       (?reply-fn {:umatched-as-echoed-from-from-server event}))))
 

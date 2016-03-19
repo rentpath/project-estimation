@@ -8,7 +8,7 @@
 
 (defmethod process! :default
   [message _ _]
-  (println "Unhandled event:" (first message)))
+  :no-op)
 
 (defmethod process! :chsk/handshake
   [_ _ {:keys [events-to-send send-fn]}]

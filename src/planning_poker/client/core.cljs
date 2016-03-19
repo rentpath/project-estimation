@@ -54,9 +54,7 @@
 (defn login
   [event]
   (.preventDefault event)
-  (let [form (aget event "currentTarget" "form")]
-    (aset form "style" "display" "none")
-    (go (>! events-to-send [::player-joined @login-name]))))
+  (go (>! events-to-send [::player-joined @login-name])))
 
 (defn select-card
   [event]
@@ -65,14 +63,17 @@
 
 (defn login-component
   []
-  (let [update-login-name (fn [evt] (reset! login-name (value evt)))]
-    [:form.login
-     [:fieldset
-      [:p "Planning Poker"]
-      [:input {:name "player-name"
-               :placeholder "Your Name"
-               :on-change update-login-name}]
-      [:button {:on-click login} "Start Playing"]]]))
+  (let [update-login-name (fn [evt] (reset! login-name (value evt)))
+        logged-in (r/atom false)]
+    (fn []
+      (when-not @logged-in
+        [:form.login
+         [:fieldset
+          [:p "Planning Poker"]
+          [:input {:name "player-name"
+                   :placeholder "Your Name"
+                   :on-change update-login-name}]
+          [:button {:on-click #(do (reset! logged-in true) (login %))} "Start Playing"]]]))))
 
 (defn cards-component
   []
