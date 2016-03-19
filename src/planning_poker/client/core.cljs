@@ -61,7 +61,7 @@
 (defn login
   [event]
   (.preventDefault event)
-  (let [form (.closest (.-currentTarget event) "form")]
+  (let [form (aget event "currentTarget" "form")]
     (aset form "style" "display" "none")
     (go (>! events-to-send [::player-joined @login-name]))))
 
