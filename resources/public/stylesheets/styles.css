@@ -157,13 +157,15 @@ button {
 .players ul {
   padding-left: 0;
   margin: 0;
-  line-height: 64px;
   font-size: 32px;
   list-style-type: none;
 }
 
 .player {
   border-bottom: 1px solid #ddd;
+  line-height: 90px;
+  position: relative;
+  width: 260px;
 }
 
 .player:first-of-type {
@@ -176,8 +178,54 @@ button {
 }
 
 .estimate {
+  border-radius: 5px;
   display: inline-block;
-  width: 110px;
+  height: 70px;
+  width: 50px;
+  text-align: center;
+  line-height: 70px;
+  position: absolute;
+  top: 8px;
+}
+
+.estimate-waiting {
+  border-style: dashed;
+  border-color: #337ab7;
+  border-width: 2px;
+}
+
+.estimate-hide {
+  background-color: #337ab7;
+  border: 1px solid #2e6da4;
+}
+
+.estimate-hide::before {
+  content: "♠";
+  color: #fff;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.estimate-show {
+  border: 2px solid #337ab7;
+}
+
+.estimate-show::before {
+  content: "♠";
+  font-size: 8px;
+  bottom: 26px;
+  left: 3px;
+  position: absolute;
+}
+
+.estimate-show::after {
+  content: "♠";
+  font-size: 8px;
+  top: 26px;
+  right: 3px;
+  position: absolute;
 }
 
 .reset {
