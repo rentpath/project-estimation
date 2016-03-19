@@ -8,6 +8,8 @@
             [planning-poker.client.form-parser :refer [value]]
             planning-poker.client.extensions))
 
+(defonce login-name (r/atom ""))
+(defonce players (r/atom {}))
 (def events-to-send (chan))
 
 (let [{:keys [ch-recv send-fn state]}
@@ -39,9 +41,6 @@
 (defn start-new-round
   [event]
   (go (>! events-to-send [::new-round-requested])))
-
-(defonce login-name (r/atom ""))
-(defonce players (r/atom {}))
 
 (defn estimated-players
   [players]

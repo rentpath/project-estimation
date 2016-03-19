@@ -1,9 +1,11 @@
 (ns planning-poker.routes
+  (:gen-class)
   (:use [org.httpkit.server :only [run-server]])
   (:require [compojure.core :refer :all]
             [compojure.route :as route]
-            [planning-poker.views :refer :all]
+            [environ.core :refer [env]]
             [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
+            [planning-poker.views :refer :all]
             [planning-poker.message-handler :refer [ring-ajax-get-or-ws-handshake
                                                     ring-ajax-post]]))
 
@@ -19,8 +21,13 @@
 
 (defonce server (atom nil))
 
+(defn port
+  []
+  (Integer. (or (env :port)
+                8080)))
+
 (defn -main [& args]
-  (reset! server (run-server #'app {:port 8080})))
+  (reset! server (run-server #'app {:port (port)})))
 
 (defn reset
   []

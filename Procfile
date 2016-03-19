@@ -1,0 +1,1 @@
+web: java $JVM_OPTS -cp target/planning-poker.jar clojure.main -m planning-poker.routes
