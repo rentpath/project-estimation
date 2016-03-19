@@ -126,8 +126,6 @@ button {
 
 .card:focus {
   outline: unset;
-  background-color: #2e6da4;
-  color: #fff;
 }
 
 .card.active {
