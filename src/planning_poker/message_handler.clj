@@ -1,7 +1,7 @@
 (ns planning-poker.message-handler
   (:require [taoensso.sente :as sente]
-            [clojure.pprint]
-            [taoensso.sente.server-adapters.http-kit :refer (sente-web-server-adapter)]))
+            [taoensso.sente.server-adapters.http-kit :refer (sente-web-server-adapter)]
+            [planning-poker.notifier :as notifier]))
 
 (defonce players (atom {}))
 
@@ -32,24 +32,6 @@
   [connected-uids]
   (:any connected-uids))
 
-(defn notify
-  [player-ids]
-  (fn [event data]
-    (doseq [id player-ids]
-      (chsk-send! id [event data]))))
-
-(defn notify-players-updated
-  [{uids :any}]
-  ((notify uids) ::players-updated @players))
-
-(defn notify-players-estimated
-  [{uids :any}]
-  ((notify uids) ::players-updated @players))
-
-(defn notify-new-round-started
-  [{uids :any}]
-  ((notify uids) ::new-round-started @players))
-
 (defmulti message-handler :id)
 
 (defn message-handler*
@@ -70,19 +52,17 @@
 (defmethod message-handler :planning-poker.client.core/player-joined
   [{:keys [?data ring-req]}]
   (swap! players assoc (player-id ring-req) {:name ?data})
-  (notify-players-updated @connected-uids))
+  (notifier/notify-players-updated @connected-uids @players chsk-send!))
 
 (defmethod message-handler :planning-poker.client.core/player-estimated
   [{:keys [?data ring-req]}]
   (swap! players assoc-in [(player-id ring-req) :estimate] ?data)
-  (notify-players-estimated @connected-uids)
-  #_(when (all-players-estimated? @players)
-    (notify-players-estimated @connected-uids)))
+  (notifier/notify-players-estimated @connected-uids @players chsk-send!))
 
 (defmethod message-handler :planning-poker.client.core/new-round-requested
   [data]
   (reset! players (player-names @players))
-  (notify-new-round-started @connected-uids))
+  (notifier/notify-new-round-started @connected-uids @players chsk-send!))
 
 (sente/start-chsk-router! ch-chsk message-handler*)
 
@@ -100,13 +80,11 @@
              (let [invalid-uids (uids-to-remove old-state new-state)]
                (when (seq invalid-uids)
                  (remove-players invalid-uids)
-                 (notify-players-updated @connected-uids)))))
+                 (notifier/notify-players-updated @connected-uids @players chsk-send!)))))
 
 (comment
   (chsk-send! "a2-b2-c3-d4-e5" [::players-updated {"a1-b2-c3-d4-e5" "Michael"}])
   (chsk-send! :sente/all-users-without-uid [::player-estimated {:a :data}])
   (player-id {:cookies {"ring-session" {:value "abcd"}}})
-  (clojure.pprint/pprint @players)
-  (notify-players-updated @connected-uids)
   (remove-players #{"7aa0b59a-7407-4426-8deb-60501425a1cc"})
   )
