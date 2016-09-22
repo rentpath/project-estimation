@@ -5,6 +5,7 @@
             [reagent.core :as r]
             [planning-poker.client.cards :as cards]
             [planning-poker.client.login :as login]
+            [planning-poker.client.player :as player]
             [planning-poker.client.message-handler :as message-handler]
             planning-poker.client.extensions))
 
@@ -44,16 +45,6 @@
     {}
     players))
 
-(defn player-component
-  [player]
-  [:li.player
-   [:span.name (:name player)]
-   [:span.estimate {:class (cond
-                             (:show-estimate? player) :estimate-show
-                             (:estimate player) :estimate-hide
-                             :else :estimate-waiting)}
-    (when (:show-estimate? player) (:estimate player))]])
-
 (defn players-component
   [players]
   (when (all-players-estimated? @players)
@@ -63,7 +54,7 @@
    [:div.names
     [:ul
      (for [[player-id player] @players]
-       ^{:key player-id} [player-component player])]]])
+       ^{:key player-id} [player/component player])]]])
 
 (defn root-component
   [players]
