@@ -54,7 +54,7 @@
   (swap! players assoc (player-id ring-req) {:name ?data})
   (notifier/notify-players-updated @connected-uids @players chsk-send!))
 
-(defmethod message-handler :planning-poker.client.core/player-estimated
+(defmethod message-handler :player/estimated
   [{:keys [?data ring-req]}]
   (swap! players assoc-in [(player-id ring-req) :estimate] ?data)
   (notifier/notify-players-estimated @connected-uids @players chsk-send!))

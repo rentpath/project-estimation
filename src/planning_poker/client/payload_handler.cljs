@@ -1,5 +1,5 @@
 (ns planning-poker.client.payload-handler
-  (:require [planning-poker.client.card-state :refer [deactivate-all-cards]]))
+  (:require [planning-poker.client.cards :refer [deactivate-all-cards]]))
 
 (defmulti process!
   (fn [message players] (-> message second first)))

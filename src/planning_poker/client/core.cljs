@@ -1,9 +1,9 @@
 (ns planning-poker.client.core
-  (:require-macros [cljs.core.async.macros :refer (go go-loop)])
-  (:require [cljs.core.async :refer (>! chan)]
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [cljs.core.async :refer [>! chan]]
             [taoensso.sente :as sente]
-            [reagent.core :as r :refer [render]]
-            [planning-poker.client.card-state :refer [change-active-card]]
+            [reagent.core :as r]
+            [planning-poker.client.cards :as cards]
             [planning-poker.client.message-handler :as message-handler]
             [planning-poker.client.form-parser :refer [value]]
             planning-poker.client.extensions))
@@ -33,11 +33,6 @@
   [players]
   (every? :estimate (vals players)))
 
-(defn notify-estimate
-  [event]
-  (let [estimate (-> event .-target .-textContent)]
-    (go (>! events-to-send [::player-estimated estimate]))))
-
 (defn start-new-round
   [event]
   (go (>! events-to-send [::new-round-requested])))
@@ -55,11 +50,6 @@
   (.preventDefault event)
   (go (>! events-to-send [::player-joined @login-name])))
 
-(defn select-card
-  [event]
-  (change-active-card event)
-  (notify-estimate event))
-
 (defn login-component
   []
   (let [update-login-name (fn [evt] (reset! login-name (value evt)))
@@ -73,13 +63,6 @@
                    :placeholder "Your Name"
                    :on-change update-login-name}]
           [:button {:on-click #(do (reset! logged-in true) (login %))} "Start Playing"]]]))))
-
-(defn cards-component
-  []
-  [:ol.cards
-   (for [x ["?" 0 1 2 3 5 8 13 20]]
-     ^{:key x} [:li
-                [:button.card {:on-click select-card} x]])])
 
 (defn player-component
   [player]
@@ -108,13 +91,13 @@
    [login-component]
    [:div.game-room
     [:h1 "Planning Poker"]
-    [cards-component]
+    [cards/component events-to-send]
     [players-component players]
     [:button.reset {:on-click start-new-round} "Play a New Round"]]])
 
 (defn main
   []
-  (render [root-component players] (first (.getElementsByClassName js/document "app"))))
+  (r/render [root-component players] (first (.getElementsByClassName js/document "app"))))
 
 (main)
 
