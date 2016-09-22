@@ -59,7 +59,7 @@
   (swap! players assoc-in [(player-id ring-req) :estimate] ?data)
   (notifier/notify-players-estimated @connected-uids @players chsk-send!))
 
-(defmethod message-handler :planning-poker.client.core/new-round-requested
+(defmethod message-handler :table/new-round-requested
   [data]
   (reset! players (player-names @players))
   (notifier/notify-new-round-started @connected-uids @players chsk-send!))
