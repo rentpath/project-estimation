@@ -4,11 +4,10 @@
             [taoensso.sente :as sente]
             [reagent.core :as r]
             [planning-poker.client.cards :as cards]
+            [planning-poker.client.login :as login]
             [planning-poker.client.message-handler :as message-handler]
-            [planning-poker.client.form-parser :refer [value]]
             planning-poker.client.extensions))
 
-(defonce login-name (r/atom ""))
 (defonce players (r/atom {}))
 (def events-to-send (chan))
 
@@ -45,25 +44,6 @@
     {}
     players))
 
-(defn login
-  [event]
-  (.preventDefault event)
-  (go (>! events-to-send [::player-joined @login-name])))
-
-(defn login-component
-  []
-  (let [update-login-name (fn [evt] (reset! login-name (value evt)))
-        logged-in (r/atom false)]
-    (fn []
-      (when-not @logged-in
-        [:form.login
-         [:fieldset
-          [:p "Planning Poker"]
-          [:input {:name "player-name"
-                   :placeholder "Your Name"
-                   :on-change update-login-name}]
-          [:button {:on-click #(do (reset! logged-in true) (login %))} "Start Playing"]]]))))
-
 (defn player-component
   [player]
   [:li.player
@@ -88,7 +68,7 @@
 (defn root-component
   [players]
   [:div
-   [login-component]
+   [login/component events-to-send]
    [:div.game-room
     [:h1 "Planning Poker"]
     [cards/component events-to-send]

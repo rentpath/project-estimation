@@ -20,7 +20,7 @@
 (defn notify-estimate
   [event channel]
   (let [estimate (-> event .-target .-textContent)]
-    (go (>! channel [:player/estimated estimate]))))
+    (go (>! channel [:table/player-estimated estimate]))))
 
 (defn select-card
   [channel]
