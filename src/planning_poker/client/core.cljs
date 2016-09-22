@@ -5,7 +5,7 @@
             [reagent.core :as r]
             [planning-poker.client.cards :as cards]
             [planning-poker.client.login :as login]
-            [planning-poker.client.player :as player]
+            [planning-poker.client.players :as table-players]
             [planning-poker.client.message-handler :as message-handler]
             planning-poker.client.extensions))
 
@@ -29,32 +29,9 @@
 
 (sente/start-chsk-router! ch-chsk handle-message)
 
-(defn all-players-estimated?
-  [players]
-  (every? :estimate (vals players)))
-
 (defn start-new-round
   [event]
   (go (>! events-to-send [::new-round-requested])))
-
-(defn estimated-players
-  [players]
-  (reduce-kv
-    (fn [acc k v]
-      (assoc acc k (assoc v :show-estimate? true)))
-    {}
-    players))
-
-(defn players-component
-  [players]
-  (when (all-players-estimated? @players)
-    (swap! players estimated-players))
-  [:div.players
-   [:h2 "Players"]
-   [:div.names
-    [:ul
-     (for [[player-id player] @players]
-       ^{:key player-id} [player/component player])]]])
 
 (defn root-component
   [players]
@@ -63,7 +40,7 @@
    [:div.game-room
     [:h1 "Planning Poker"]
     [cards/component events-to-send]
-    [players-component players]
+    [table-players/component players]
     [:button.reset {:on-click start-new-round} "Play a New Round"]]])
 
 (defn main
@@ -71,8 +48,3 @@
   (r/render [root-component players] (first (.getElementsByClassName js/document "app"))))
 
 (main)
-
-(comment
-  (all-players-estimated? {"abc-def" {:name "El Guapo" :estimate 3}})
-  (all-players-estimated? {"abc-def" {:name "El Guapo"}})
-  )
