@@ -16,8 +16,6 @@
   (def ch-chsk ch-recv) ; ChannelSocket's receive channel
   (def chsk-send! send-fn)) ; ChannelSocket's send API fn
 
-(enable-console-print!)
-
 (defn handle-message
   [{event :event, :as event-message}]
   (message-handler/process! event
@@ -26,10 +24,10 @@
                              :events-to-send channel
                              :send-fn chsk-send!}))
 
-(sente/start-chsk-router! ch-chsk handle-message)
-
 (defn main
   []
+  (enable-console-print!)
+  (sente/start-chsk-router! ch-chsk handle-message)
   (r/render [game-table/component players channel]
             (first (.getElementsByClassName js/document "app"))))
 
