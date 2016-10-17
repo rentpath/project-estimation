@@ -30,4 +30,7 @@
                    :placeholder "Your Name"
                    :on-change update-name
                    :auto-focus true}]
-          [:button {:on-click #(do (reset! logged-in true) ((login channel) %))} "Start Playing"]]]))))
+          [:button
+           {:on-click #(do (reset! logged-in true)
+                           ((login channel) %))}
+           "Start Playing"]]]))))

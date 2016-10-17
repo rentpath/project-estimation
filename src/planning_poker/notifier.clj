@@ -17,3 +17,7 @@
 (defn notify-new-round-started
   [{player-ids :any} players notify-client-fn]
   ((notify player-ids notify-client-fn) ::new-round-started players))
+
+(comment
+  (chsk-send! "a2-b2-c3-d4-e5" [:table/players-updated {"a1-b2-c3-d4-e5" "Michael"}])
+  )

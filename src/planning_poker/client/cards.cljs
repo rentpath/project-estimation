@@ -3,34 +3,39 @@
    [cljs.core.async.macros :refer [go]])
   (:require
    [cljs.core.async :refer [>!]]
+   [reagent.core :as r]
    planning-poker.client.extensions))
+
+(defn notify-card-selected
+  [card channel]
+  (go (>! channel [:table/player-estimated card])))
+
+(def cards ["?" 0 1 2 3 5 8 13 20])
+(defonce active-card (r/atom nil))
+
+(defn activate-card
+  [card]
+  (reset! active-card card))
 
 (defn deactivate-all-cards
   []
-  (let [cards (.getElementsByClassName js/document "card")]
-    (doseq [card cards]
-      (-> card .-classList (.remove "active")))))
-
-(defn change-active-card
-  [event]
-  (deactivate-all-cards)
-  (let [card (.-currentTarget event)]
-    (-> card .-classList (.add "active"))))
-
-(defn notify-estimate
-  [event channel]
-  (let [estimate (-> event .-target .-textContent)]
-    (go (>! channel [:table/player-estimated estimate]))))
+  (reset! active-card nil))
 
 (defn select-card
-  [channel]
-  (fn [event]
-    (change-active-card event)
-    (notify-estimate event channel)))
+  [card channel]
+  (fn [_event]
+    (activate-card card)
+    (notify-card-selected card channel)))
 
 (defn component
   [channel]
-  [:ol.cards
-   (for [x ["?" 0 1 2 3 5 8 13 20]]
-     ^{:key x} [:li
-                [:button.card {:on-click (select-card channel)} x]])])
+  (let [active? (fn [card]
+                  (= card @active-card))]
+    [:ol.cards
+     ;; doall allows component to re-render when active-card gets updated
+     (doall (for [card cards]
+              ^{:key card} [:li
+                            [:button.card
+                             {:on-click (select-card card channel)
+                              :class (if (active? card) "active" "")}
+                             card]]))]))

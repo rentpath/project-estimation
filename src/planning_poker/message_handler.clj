@@ -63,8 +63,3 @@
                (when (seq invalid-uids)
                  (table/remove-players! players invalid-uids)
                  (notifier/notify-players-updated @connected-uids @players chsk-send!)))))
-
-(comment
-  (chsk-send! "a2-b2-c3-d4-e5" [:table/players-updated {"a1-b2-c3-d4-e5" "Michael"}])
-  (chsk-send! :sente/all-users-without-uid [:table/player-estimated {:a :data}])
-  )
