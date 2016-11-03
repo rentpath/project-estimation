@@ -27,15 +27,17 @@
     (activate-card card)
     (notify-card-selected card channel)))
 
+(defn active?
+  [card]
+  (= card @active-card))
+
 (defn component
   [channel]
-  (let [active? (fn [card]
-                  (= card @active-card))]
-    [:ol.cards
-     ;; doall allows component to re-render when active-card gets updated
-     (doall (for [card cards]
-              ^{:key card} [:li
-                            [:button.card
-                             {:on-click (select-card card channel)
-                              :class (if (active? card) "active" "")}
-                             card]]))]))
+  [:ol.cards
+   ;; doall allows component to re-render when active-card gets updated
+   (doall (for [card cards]
+            ^{:key card} [:li
+                          [:button.card
+                           {:on-click (select-card card channel)
+                            :class (if (active? card) "active" "")}
+                           card]]))])
