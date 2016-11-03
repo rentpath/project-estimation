@@ -1,4 +1,4 @@
-(ns planning-poker.table)
+(ns planning-poker.game-table)
 
 (defn player-names
   [players]

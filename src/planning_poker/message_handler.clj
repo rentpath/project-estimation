@@ -2,7 +2,7 @@
   (:require [taoensso.sente :as sente]
             [taoensso.sente.server-adapters.http-kit :refer (sente-web-server-adapter)]
             [planning-poker.notifier :as notifier]
-            [planning-poker.table :as table]))
+            [planning-poker.game-table :as table]))
 
 (defonce players (atom {}))
 
