@@ -16,8 +16,8 @@
   [players channel]
   [:div
    [login/component channel]
-   [:div.game-room
-    [:h1 "Planning Poker"]
+   [:div.game-table
+    [:h1.game-table-heading "Remote Planning Poker"]
     [cards/component channel]
     [table-players/component players]
     [:button.reset {:on-click (start-new-round channel)} "Play a New Round"]]])

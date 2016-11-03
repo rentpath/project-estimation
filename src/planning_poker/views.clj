@@ -8,7 +8,7 @@
     (include-css "/stylesheets/styles.css")]
    [:body
     [:div.app
-     [:h1 "Remote Planning Poker"]
+     [:h1.home-heading "Remote Planning Poker"]
      [:a.new-game {:href (str "/" (java.util.UUID/randomUUID))} "Start a Game"]
 
      [:h2 "Join Existing Game"]

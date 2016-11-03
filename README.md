@@ -29,5 +29,6 @@ If you use ngrok, make sure your web server configuration allows you to access t
 ## Licenses
 PLANNING POKER ® is a registered trademark of Mountain Goat Software, LLC
 Sequence of values is (C) Mountain Goat Software, LLC
+Coffee Tin font: 1.01 Coffee Tin Copr. 1993 By Richard William Mueller
 
 Copyright © 2015

@@ -25,7 +25,7 @@
       (when-not @logged-in
         [:form.login
          [:fieldset
-          [:p "Planning Poker"]
+          [:p "Remote Planning Poker"]
           [:input {:name "player-name"
                    :placeholder "Your Name"
                    :on-change update-name
