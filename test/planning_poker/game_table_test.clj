@@ -1,6 +1,6 @@
-(ns planning-poker.table-test
+(ns planning-poker.game-table-test
   (:require
-   [planning-poker.table :refer :all]
+   [planning-poker.game-table :refer :all]
    [clojure.test :refer :all]))
 
 (deftest player-names-test
