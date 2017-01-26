@@ -4,6 +4,7 @@
   (:require
    [cljs.core.async :refer [>!]]
    [reagent.core :as r]
+   [planning-poker.client.utils :refer [path]]
    planning-poker.client.extensions))
 
 (defn notify-card-selected

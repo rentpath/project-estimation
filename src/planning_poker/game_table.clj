@@ -1,24 +1,26 @@
 (ns planning-poker.game-table)
 
-(defn player-names
-  [players]
-  (reduce (fn [accumulator [player-id player-data]]
-            (assoc accumulator player-id {:name (:name player-data)}))
-            {}
-            players))
+(defn remove-estimates
+  [players table-id]
+  (reduce-kv (fn [acc id data]
+               (if (= table-id (:table-id data))
+                 (assoc acc id (dissoc data :estimate))
+                 (assoc acc id data)))
+             {}
+             players))
 
 (defn remove-players!
   [all-players players-to-remove]
   (swap! all-players (fn [collection] (apply dissoc collection players-to-remove))))
 
 (defn add-player!
-  [players id player-name]
-  (swap! players assoc id {:name player-name}))
+  [players id data]
+  (swap! players assoc id data))
 
 (defn estimate!
   [players id estimate]
   (swap! players assoc-in [id :estimate] estimate))
 
 (defn reset-estimates!
-  [players]
-  (reset! players (player-names @players)))
+  [players table-id]
+  (reset! players (remove-estimates @players table-id)))

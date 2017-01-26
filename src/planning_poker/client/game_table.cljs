@@ -1,16 +1,15 @@
 (ns planning-poker.client.game-table
-  (:require-macros
-   [cljs.core.async.macros :refer [go]])
-  (:require
-   [cljs.core.async :refer [>!]]
-   [planning-poker.client.cards :as cards]
-   [planning-poker.client.login :as login]
-   [planning-poker.client.players :as table-players]))
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [cljs.core.async :refer [>!]]
+            [planning-poker.client.cards :as cards]
+            [planning-poker.client.login :as login]
+            [planning-poker.client.players :as table-players]
+            [planning-poker.client.utils :refer [path]]))
 
 (defn- start-new-round
   [channel]
   (fn [event]
-    (go (>! channel [:table/new-round-requested]))))
+    (go (>! channel [:table/new-round-requested (path)]))))
 
 (defn component
   [players channel]

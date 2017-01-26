@@ -4,7 +4,8 @@
   (:require
    [cljs.core.async :refer [>!]]
    [reagent.core :as r]
-   [planning-poker.client.form-parser :refer [value]]))
+   [planning-poker.client.form-parser :refer [value]]
+   [planning-poker.client.utils :refer [path]]))
 
 (defonce player-name (r/atom ""))
 
@@ -12,7 +13,8 @@
   [channel]
   (fn [event]
     (.preventDefault event)
-    (go (>! channel [:table/player-joined @player-name]))))
+    (go (>! channel [:table/player-joined {:name @player-name
+                                           :table-id (path)}]))))
 
 (defn- update-name
   [event]

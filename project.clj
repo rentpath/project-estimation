@@ -1,6 +1,6 @@
 (defproject planning-poker "0.1.0-SNAPSHOT"
   :description "Planning poker for remote agile teams"
-  :url "https://vast-wave-40853.herokuapp.com"
+  :url "https://remoteplanning.herokuapp.com"
   :min-lein-version "2.0.0"
   :dependencies [[com.taoensso/sente "1.6.0"]
                  [compojure "1.4.0"]
