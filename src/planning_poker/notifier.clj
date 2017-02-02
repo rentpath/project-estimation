@@ -1,22 +1,19 @@
 (ns planning-poker.notifier)
 
 (defn- notify
-  [player-ids notify-client-fn]
-  (fn [event data]
-    (doseq [id player-ids]
-      (notify-client-fn id [event data]))))
+  [players notify-client-fn event]
+  (doseq [id (keys players)]
+    (notify-client-fn id [event players])))
 
 (defn notify-players-updated
-  [player-ids players notify-client-fn]
-  ((notify player-ids notify-client-fn) ::players-updated players))
+  [players notify-client-fn]
+  (notify players notify-client-fn ::players-updated))
 
-(defn notify-players-estimated
-  [player-ids players notify-client-fn]
-  ((notify player-ids notify-client-fn) ::players-updated players))
+(def notify-players-estimated notify-players-updated)
 
 (defn notify-new-round-started
-  [player-ids players notify-client-fn]
-  ((notify player-ids notify-client-fn) ::new-round-started players))
+  [players notify-client-fn]
+  (notify players notify-client-fn ::new-round-started))
 
 (comment
   (chsk-send! "a2-b2-c3-d4-e5" [:table/players-updated {"a1-b2-c3-d4-e5" "Michael"}])

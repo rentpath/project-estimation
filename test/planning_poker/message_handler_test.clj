@@ -7,14 +7,6 @@
     (is (= "abcd"
            (user-id {:cookies {"ring-session" {:value "abcd"}}})))))
 
-(deftest player-ids-at-table-test
-  (testing "returning all player ids at a table"
-    (let [players {"a1-b2" {:name "El Guapo" :table-id "x1"}
-                   "e5-f6" {:name "R2-D2" :table-id "x1"}
-                   "g8-h9" {:name "Michael" :table-id "y2"}}]
-      (is (= ["a1-b2" "e5-f6"]
-             (player-ids-at-table players "x1"))))))
-
 (deftest players-at-table-test
   (testing "returning all players at a table"
     (let [players {"a1-b2" {:name "El Guapo" :table-id "x1"}

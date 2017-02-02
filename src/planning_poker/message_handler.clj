@@ -44,10 +44,6 @@
           {}
           players))
 
-(defn player-ids-at-table
-  [players table-id]
-  (keys (players-at-table players table-id)))
-
 (defmulti message-handler :id)
 
 (defmethod message-handler :default
@@ -65,28 +61,23 @@
     (table/add-player! players
                        (user-id req)
                        player)
-    (notifier/notify-players-updated (player-ids-at-table @players (:table-id player))
-                                     (players-at-table @players (:table-id player))
+    (notifier/notify-players-updated (players-at-table @players (:table-id player))
                                      chsk-send!)
-    (when old-table-id
-      (notifier/notify-players-updated (player-ids-at-table @players old-table-id)
-                                       (players-at-table @players old-table-id)
-                                       chsk-send!))))
+    (when old-table-id (notifier/notify-players-updated (players-at-table @players old-table-id)
+                                                        chsk-send!))))
 
 (defmethod message-handler :table/player-estimated
   [{estimate :?data req :ring-req}]
   (let [id (user-id req)
         table-id (table-for-player-id @players id)]
     (table/estimate! players id estimate)
-    (notifier/notify-players-estimated (player-ids-at-table @players table-id)
-                                       (players-at-table @players table-id)
+    (notifier/notify-players-estimated (players-at-table @players table-id)
                                        chsk-send!)))
 
 (defmethod message-handler :table/new-round-requested
   [{table-id :?data}]
   (table/reset-estimates! players table-id)
-  (notifier/notify-new-round-started (player-ids-at-table @players table-id)
-                                     (players-at-table @players table-id)
+  (notifier/notify-new-round-started (players-at-table @players table-id)
                                      chsk-send!))
 
 (defn uids-to-remove
@@ -102,7 +93,5 @@
                  (let [table-ids (tables-for-player-ids @players invalid-uids)]
                    (table/remove-players! players invalid-uids)
                    (doseq [table-id table-ids]
-                     (notifier/notify-players-updated
-                      (player-ids-at-table @players table-id)
-                      (players-at-table @players table-id)
-                      chsk-send!)))))))
+                     (notifier/notify-players-updated (players-at-table @players table-id)
+                                                      chsk-send!)))))))
