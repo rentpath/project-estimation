@@ -124,6 +124,7 @@ button {
 
 .cards {
   list-style-type: none;
+  margin: 0;
   padding: 0;
   max-width: 600px;
   display: inline-block;
@@ -171,6 +172,7 @@ button {
 
 .players {
   display: inline-block;
+  margin-bottom: 20px;
   vertical-align: top;
 }
 
@@ -248,16 +250,16 @@ button {
   position: absolute;
 }
 
-.reset {
+.reset,
+.reveal-cards {
   background-color: #337ab7;
   border: 1px solid #2e6da4;
   border-radius: 4px;
   color: #fff;
-  display: block;
   font-size: 18px;
   height: 45px;
+  margin: 20px 20px 0 0;
   padding: 0 10px;
-  margin-top: 20px;
 }
 
 .reset:hover {

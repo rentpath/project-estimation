@@ -80,6 +80,12 @@
   (notifier/notify-new-round-started (players-at-table @players table-id)
                                      chsk-send!))
 
+(defmethod message-handler :table/reveal-cards
+  [{table-id :?data}]
+  (table/force-estimates! players table-id)
+  (notifier/notify-players-estimated (players-at-table @players table-id)
+                                     chsk-send!))
+
 (defn uids-to-remove
   [old-connected-uids current-connected-uids]
   (clojure.set/difference (uids old-connected-uids) (uids current-connected-uids)))

@@ -3,15 +3,6 @@
    [planning-poker.game-table :refer :all]
    [clojure.test :refer :all]))
 
-(deftest player-names-test
-  (testing "returns a collection of player names"
-    (let [all-players {"a1-b2" {:name "El Guapo" :estimate 3}
-                       "r2-d2" {:name "R2-D2" :estimate 5}}
-          names {"a1-b2" {:name "El Guapo"}
-                 "r2-d2" {:name "R2-D2"}}]
-      (is (= names
-             (player-names all-players))))))
-
 (deftest remove-players!-test
   (testing "removes a player from the collection of players"
     (let [players (atom {"a1-b2" {:name "El Guapo" :estimate 3}
@@ -87,3 +78,15 @@
                                   :estimate 5}}]
       (is (= players-after
              (remove-estimates players "x1"))))))
+
+(deftest force-estimates!-test
+  (testing "setting any unestimated players to an estimate of '?'"
+    (testing "all players at same table"
+      (let [players (atom {"a1-b2" {:name "El Guapo"
+                                    :table-id "x1"
+                                    :estimate 3}
+                           "e5-f6" {:name "R2-D2"
+                                    :table-id "x1"}})]
+        (force-estimates! players "x1")
+        (is (= "?"
+               (get-in @players ["e5-f6" :estimate])))))))

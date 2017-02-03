@@ -8,8 +8,13 @@
 
 (defn- start-new-round
   [channel]
-  (fn [event]
+  (fn [_event]
     (go (>! channel [:table/new-round-requested (path)]))))
+
+(defn reveal-cards
+  [channel]
+  (fn [_event]
+    (go (>! channel [:table/reveal-cards (path)]))))
 
 (defn component
   [players channel]
@@ -19,4 +24,6 @@
     [:h1.game-table-heading "Remote Planning Poker"]
     [cards/component channel]
     [table-players/component players]
-    [:button.reset {:on-click (start-new-round channel)} "Play a New Round"]]])
+    [:div
+     [:button.reset {:on-click (start-new-round channel)} "Play a New Round"]
+     [:button.reveal-cards {:on-click (reveal-cards channel)} "Reveal Cards"]]]])

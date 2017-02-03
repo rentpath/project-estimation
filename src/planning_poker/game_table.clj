@@ -9,6 +9,15 @@
              {}
              players))
 
+(defn fill-estimates
+  [players table-id]
+  (reduce-kv (fn [acc id data]
+               (if (= table-id (:table-id data))
+                 (assoc acc id (merge {:estimate "?"} data))
+                 (assoc acc id data)))
+             {}
+             players))
+
 (defn remove-players!
   [all-players players-to-remove]
   (swap! all-players (fn [collection] (apply dissoc collection players-to-remove))))
@@ -24,3 +33,7 @@
 (defn reset-estimates!
   [players table-id]
   (reset! players (remove-estimates @players table-id)))
+
+(defn force-estimates!
+  [players table-id]
+  (reset! players (fill-estimates @players table-id)))
