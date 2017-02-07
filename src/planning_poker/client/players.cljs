@@ -2,32 +2,28 @@
   (:require
    [planning-poker.client.player :as player]))
 
-(defn- estimated-players
-  [players]
-  (reduce-kv
-    (fn [acc k v]
-      (assoc acc k (assoc v :show-estimate? true)))
-    {}
-    players))
-
 (defn- all-players-estimated?
   [players]
   (every? :estimate (vals players)))
 
-(defn- active-players
+(defn- add-estimate-flag
   [players]
-  (into {} (filter #(-> % val :observer not) players)))
+  (if (all-players-estimated? players)
+    (reduce-kv (fn [acc k v]
+                 (assoc acc k (assoc v :show-estimate? true)))
+               {}
+               players)
+    players))
 
 (defn component
   [players]
-  (when (all-players-estimated? (active-players @players))
-    (swap! players estimated-players))
-  [:div.players
-   [:h2 "Players"]
-   [:div.names
-    [:ul
-     (for [[player-id player] (active-players @players)]
-       ^{:key player-id} [player/component player])]]])
+  (let [players (add-estimate-flag players)]
+    [:div.players
+     [:h2 "Players"]
+     [:div.names
+      [:ul
+       (for [[player-id player] players]
+         ^{:key player-id} [player/component player])]]]))
 
 (comment
   (all-players-estimated? {"abc-def" {:name "El Guapo"}})

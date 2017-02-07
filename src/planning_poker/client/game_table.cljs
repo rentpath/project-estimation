@@ -16,6 +16,10 @@
   (fn [_event]
     (go (>! channel [:table/reveal-cards (path)]))))
 
+(defn- active-players
+  [players]
+  (into {} (filter #(-> % val :observer not) players)))
+
 (defn component
   [players channel]
   [:div
@@ -23,7 +27,7 @@
    [:div.game-table
     [:h1.game-table-heading "Remote Planning Poker"]
     [cards/component channel]
-    [table-players/component players]
+    [table-players/component (active-players @players)]
     [:div
      [:button.reset {:on-click (start-new-round channel)} "Play a New Round"]
      [:button.reveal-cards {:on-click (reveal-cards channel)} "Reveal Cards"]]]])

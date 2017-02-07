@@ -19,8 +19,8 @@
       (recur))))
 
 (defmethod process! :chsk/state
-  [message _ _]
-  (println "State" message))
+  [_ _ _]
+  :no-op)
 
 (defmethod process! :chsk/recv
   [message players _]

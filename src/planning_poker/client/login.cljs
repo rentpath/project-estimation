@@ -10,6 +10,8 @@
 (defonce player-name (r/atom ""))
 (defonce observer? (r/atom false))
 
+;; Using FormData would be nicer than using atoms, but Safari doesn't support FormData's
+;; read methods.
 (defn- login
   [channel]
   (fn [event]
@@ -31,17 +33,15 @@
   (let [logged-in (r/atom false)]
     (fn []
       (when-not @logged-in
-        [:form.login
+        [:form.login {:on-submit #(do (reset! logged-in true)
+                                      ((login channel) %))}
          [:fieldset
           [:p "Remote Planning Poker"]
           [:input.login-name {:name "player-name"
                               :placeholder "Your Name"
                               :on-change update-name
                               :auto-focus true}]
-          [:button
-           {:on-click #(do (reset! logged-in true)
-                           ((login channel) %))}
-           "Start Playing"]
+          [:button "Start Playing"]
           [:div.login-observer-controls
            [:input.login-observer
             {:type :checkbox
