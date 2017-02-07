@@ -14,15 +14,19 @@
   [players]
   (every? :estimate (vals players)))
 
+(defn- active-players
+  [players]
+  (into {} (filter #(-> % val :observer not) players)))
+
 (defn component
   [players]
-  (when (all-players-estimated? @players)
+  (when (all-players-estimated? (active-players @players))
     (swap! players estimated-players))
   [:div.players
    [:h2 "Players"]
    [:div.names
     [:ul
-     (for [[player-id player] @players]
+     (for [[player-id player] (active-players @players)]
        ^{:key player-id} [player/component player])]]])
 
 (comment

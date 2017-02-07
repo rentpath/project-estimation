@@ -11,7 +11,7 @@
   (fn [_event]
     (go (>! channel [:table/new-round-requested (path)]))))
 
-(defn reveal-cards
+(defn- reveal-cards
   [channel]
   (fn [_event]
     (go (>! channel [:table/reveal-cards (path)]))))
