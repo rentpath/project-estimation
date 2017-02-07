@@ -15,20 +15,28 @@
                  [ring "1.4.0"]
                  [ring/ring-defaults "0.1.5"]]
   :profiles {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
-                                  [ring-mock "0.1.5"]]}
+                                  [ring-mock "0.1.5"]
+                                  [doo "0.1.7"]]}
              :uberjar {:prep-tasks ["compile" ["cljsbuild" "once" "production"]]
                        :aot [planning-poker.routes]
                        :uberjar-name "planning-poker.jar"}}
-  :plugins [[lein-cljsbuild "1.1.0"]]
+  :plugins [[lein-cljsbuild "1.1.0"]
+            [lein-doo "0.1.7"]]
   :source-paths ["src"]
   :clean-targets ^{:protect false} ["resources/public/javascript"]
-  :cljsbuild {:builds [{:source-paths ["src"]
+  :cljsbuild {:builds [{:id "dev"
+                        :source-paths ["src"]
                         :compiler {:main "planning-poker.client.core"
                                    :asset-path "javascript"
                                    :output-dir "resources/public/javascript"
                                    :output-to "resources/public/javascript/main.js"
                                    :optimizations :none
                                    :verbose true}}
+                       {:id "test"
+                        :source-paths ["src" "test"]
+                        :compiler {:main 'planning-poker.client.runner
+                                   :output-to "out/test.js"
+                                   :optimizations :none}}
                        {:id "production"
                         :source-paths ["src"]
                         :compiler {:main "planning-poker.client.core"

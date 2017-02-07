@@ -16,7 +16,7 @@
   (fn [_event]
     (go (>! channel [:table/reveal-cards (path)]))))
 
-(defn- active-players
+(defn active-players
   [players]
   (into {} (filter #(-> % val :observer not) players)))
 

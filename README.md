@@ -9,11 +9,11 @@ You will need [Leiningen][] 2.0.0 or above installed.
 ## Compiling Assets
 Run:
 
-    lein cljsbuild once
+    lein cljsbuild once dev
 
 To automatically compile assets when you change a file, run:
 
-    lein cljsbuild auto
+    lein cljsbuild auto dev
 
 
 ## Running
