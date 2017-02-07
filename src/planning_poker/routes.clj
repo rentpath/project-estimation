@@ -5,6 +5,7 @@
             [compojure.route :as route]
             [environ.core :refer [env]]
             [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
+            [ring.middleware.gzip :refer [wrap-gzip]]
             [planning-poker.views :refer :all]
             [planning-poker.message-handler :refer [ring-ajax-get-or-ws-handshake
                                                     ring-ajax-post]]))
@@ -17,7 +18,7 @@
   (route/not-found "Not Found"))
 
 (def app
-  (wrap-defaults app-routes site-defaults))
+  (wrap-gzip (wrap-defaults app-routes site-defaults)))
 
 (defonce server (atom nil))
 

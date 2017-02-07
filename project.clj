@@ -13,7 +13,8 @@
                  [environ "1.0.2"]
                  [reagent "0.5.0"]
                  [ring "1.4.0"]
-                 [ring/ring-defaults "0.1.5"]]
+                 [ring/ring-defaults "0.1.5"]
+                 [org.clojars.mikejs/ring-gzip-middleware "0.1.0-SNAPSHOT"]]
   :profiles {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
                                   [ring-mock "0.1.5"]
                                   [doo "0.1.7"]]}
