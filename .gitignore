@@ -11,3 +11,4 @@ pom.xml.asc
 /.nrepl-port
 /resources/public/javascript
 .#*
+doo-index.html

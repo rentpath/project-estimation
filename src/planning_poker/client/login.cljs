@@ -4,29 +4,22 @@
   (:require
    [cljs.core.async :refer [>!]]
    [reagent.core :as r]
+   [goog.dom.forms :as forms]
    [planning-poker.client.form-parser :refer [value]]
    [planning-poker.client.utils :refer [path]]))
 
-(defonce player-name (r/atom ""))
-(defonce observer? (r/atom false))
+(defn- field-value
+  [form name]
+  (first (.get form name)))
 
-;; Using FormData would be nicer than using atoms, but Safari doesn't support FormData's
-;; read methods.
 (defn- login
   [channel]
   (fn [event]
     (.preventDefault event)
-    (go (>! channel [:table/player-joined {:name @player-name
-                                           :table-id (path)
-                                           :observer @observer?}]))))
-
-(defn- update-name
-  [event]
-  (reset! player-name (value event)))
-
-(defn- update-observer-status
-  [_event]
-  (reset! observer? (not @observer?)))
+    (let [form (forms/getFormDataMap (.-currentTarget event))]
+      (go (>! channel [:table/player-joined {:name (field-value form "player-name")
+                                             :table-id (path)
+                                             :observer (field-value form "observer")}])))))
 
 (defn component
   [channel]
@@ -37,16 +30,15 @@
                                       ((login channel) %))}
          [:fieldset
           [:p "Remote Planning Poker"]
-          [:input.login-name {:name "player-name"
+          [:input.login-name {:name :player-name
                               :placeholder "Your Name"
-                              :on-change update-name
                               :auto-focus true}]
           [:button "Start Playing"]
           [:div.login-observer-controls
            [:input.login-observer
             {:type :checkbox
-             :id :login-observer
-             :on-change update-observer-status}]
+             :id :observer
+             :name :observer}]
            [:label
-            {:for :login-observer}
+            {:for :observer}
             "I'm just observing."]]]]))))
