@@ -1,4 +1,6 @@
-# planning-poker
+# project-estimation
+
+Remote Project Estimation is a way for remote teams to estimate project tasks together.
 
 ## Prerequisites
 
@@ -26,9 +28,12 @@ Then, load http://localhost:8080 in your web browser.
 
 If you use ngrok, make sure your web server configuration allows you to access the app at http://127.0.0.1:8080.
 
-## Licenses
+## Credits
+
+Remote Project Estimation is inspired by Planning Poker ®.
+
 PLANNING POKER ® is a registered trademark of Mountain Goat Software, LLC
+
 Sequence of values is (C) Mountain Goat Software, LLC
-Coffee Tin font copyright: 1.01 Coffee Tin Copr. 1993 By Richard William Mueller
 
 Copyright © 2016

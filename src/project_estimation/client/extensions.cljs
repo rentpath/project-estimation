@@ -1,4 +1,4 @@
-(ns planning-poker.client.extensions)
+(ns project-estimation.client.extensions)
 
 (extend-type js/HTMLCollection
   ISeqable

@@ -1,12 +1,12 @@
-(ns planning-poker.client.login
+(ns project-estimation.client.login
   (:require-macros
    [cljs.core.async.macros :refer [go]])
   (:require
    [cljs.core.async :refer [>!]]
    [reagent.core :as r]
    [goog.dom.forms :as forms]
-   [planning-poker.client.form-parser :refer [value]]
-   [planning-poker.client.utils :refer [path]]))
+   [project-estimation.client.form-parser :refer [value]]
+   [project-estimation.client.utils :refer [path]]))
 
 (defn- field-value
   [form name]
@@ -17,9 +17,9 @@
   (fn [event]
     (.preventDefault event)
     (let [form (forms/getFormDataMap (.-currentTarget event))]
-      (go (>! channel [:table/player-joined {:name (field-value form "player-name")
-                                             :table-id (path)
-                                             :observer (field-value form "observer")}])))))
+      (go (>! channel [:board/participant-joined {:name (field-value form "participant-name")
+                                                  :board-id (path)
+                                                  :observer (field-value form "observer")}])))))
 
 (defn component
   [channel]
@@ -29,8 +29,8 @@
         [:form.login {:on-submit #(do (reset! logged-in true)
                                       ((login channel) %))}
          [:fieldset
-          [:p "Remote Planning Poker"]
-          [:input.login-name {:name :player-name
+          [:p "Remote Project Estimation"]
+          [:input.login-name {:name :participant-name
                               :placeholder "Your Name"
                               :auto-focus true}]
           [:button "Start Playing"]

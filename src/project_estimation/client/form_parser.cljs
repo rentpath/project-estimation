@@ -1,4 +1,4 @@
-(ns planning-poker.client.form-parser)
+(ns project-estimation.client.form-parser)
 
 (defn value
   "Retrieve the value of the event's target."

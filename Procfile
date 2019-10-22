@@ -1,1 +1,1 @@
-web: java $JVM_OPTS -cp target/planning-poker.jar clojure.main -m planning-poker.routes
+web: java $JVM_OPTS -cp target/project-estimation.jar clojure.main -m project-estimation.routes

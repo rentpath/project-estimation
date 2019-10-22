@@ -1,13 +1,13 @@
-(ns planning-poker.client.core
+(ns project-estimation.client.core
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [cljs.core.async :refer [chan]]
             [taoensso.sente :as sente]
             [reagent.core :as r]
-            [planning-poker.client.game-table :as game-table]
-            [planning-poker.client.message-handler :as message-handler]
-            [planning-poker.client.extensions]))
+            [project-estimation.client.estimation-board :as board]
+            [project-estimation.client.message-handler :as message-handler]
+            [project-estimation.client.extensions]))
 
-(defonce players (r/atom {}))
+(defonce participants (r/atom {}))
 (def channel (chan))
 
 (let [{:keys [ch-recv send-fn state]}
@@ -19,7 +19,7 @@
 (defn handle-message
   [{event :event, :as event-message}]
   (message-handler/process! event
-                            players
+                            participants
                             {:event event
                              :events-to-send channel
                              :send-fn chsk-send!}))
@@ -28,7 +28,7 @@
   []
   (enable-console-print!)
   (sente/start-chsk-router! ch-chsk handle-message)
-  (r/render [game-table/component players channel]
+  (r/render [board/component participants channel]
             (first (.getElementsByClassName js/document "app"))))
 
 (main)
