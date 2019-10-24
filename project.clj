@@ -1,5 +1,5 @@
-(defproject planning-poker "0.1.0-SNAPSHOT"
-  :description "Planning poker for remote agile teams"
+(defproject project-estimation "0.1.0-SNAPSHOT"
+  :description "Project estimation for remote agile teams"
   :url "https://remoteplanning.herokuapp.com"
   :min-lein-version "2.0.0"
   :dependencies [[com.taoensso/sente "1.6.0"]
@@ -19,15 +19,15 @@
                                   [ring-mock "0.1.5"]
                                   [doo "0.1.7"]]}
              :uberjar {:prep-tasks ["compile" ["cljsbuild" "once" "production"]]
-                       :aot [planning-poker.routes]
-                       :uberjar-name "planning-poker.jar"}}
+                       :aot [project-estimation.routes]
+                       :uberjar-name "project-estimation.jar"}}
   :plugins [[lein-cljsbuild "1.1.0"]
             [lein-doo "0.1.7"]]
   :source-paths ["src"]
   :clean-targets ^{:protect false} ["resources/public/javascript"]
   :cljsbuild {:builds [{:id "dev"
                         :source-paths ["src"]
-                        :compiler {:main "planning-poker.client.core"
+                        :compiler {:main "project-estimation.client.core"
                                    :asset-path "javascript"
                                    :output-dir "resources/public/javascript"
                                    :output-to "resources/public/javascript/main.js"
@@ -35,14 +35,14 @@
                                    :verbose true}}
                        {:id "test"
                         :source-paths ["src" "test"]
-                        :compiler {:main 'planning-poker.client.runner
+                        :compiler {:main 'project-estimation.client.runner
                                    :output-to "out/test.js"
                                    :optimizations :none}}
                        {:id "production"
                         :source-paths ["src"]
-                        :compiler {:main "planning-poker.client.core"
+                        :compiler {:main "project-estimation.client.core"
                                    :asset-path "javascript"
                                    :output-to "resources/public/javascript/main.js"
                                    :optimizations :advanced
                                    :verbose true}}]}
-  :main planning-poker.routes)
+  :main project-estimation.routes)

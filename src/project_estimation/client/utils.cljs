@@ -1,4 +1,4 @@
-(ns planning-poker.client.utils)
+(ns project-estimation.client.utils)
 
 (defn path
   []
